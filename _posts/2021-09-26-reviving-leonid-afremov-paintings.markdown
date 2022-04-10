@@ -190,7 +190,7 @@ During training, I enabled shift_segmentation=True to deal with 255 unlabeled da
 Prepare your own segmentation annotation file, beware these restrictions:
 
 1. You can not go too far from original painting compositions, modify the original segmentation is a good place to start with
-2. It cam generate larger resolution images, but that does not mean larger object with tiny details, enlarge the canvas size but not object size
+2. It can generate larger resolution images, but that does not mean larger object with tiny details, enlarge the canvas size but not object size
 3. Don't try to compose wrong catagories together, remember the low angle magic stuff we talked about earlier ?
 4. It will always generate similar contents compared to original paintings, like the previous shown second one, it nearly reconstruct the original painting, you can not draw something 'that original' from leonid afremov himself
 
@@ -315,7 +315,7 @@ To some degrees, we are already possible to draw a painting
 
 1. Looks like a oil painting by leonid afremov (style)
 2. Composition controlled as we wish, but not breaking freely on all object catagories (composition)
-3. Complete traning with only a few data avaliable (only 600 paintings)
+3. Complete training with only a few data avaliable (only 600 paintings)
 4. Sample on higher resolution
 
 ## References
