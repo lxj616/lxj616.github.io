@@ -15,7 +15,7 @@ Using his unique painting technique and unmistakable blotchy, dotty style, Afrem
 
 I have been admired his talent for years, the bright color caught my eyes and also raised my interest, does recently developed neural network algorithms have the ability to create such art ?
 
-## Results From Conditional VQGAN & transformer
+## Results From VQGAN & Conditional Transformer
 
 https://github.com/CompVis/taming-transformers
 
@@ -101,7 +101,7 @@ However, it's low resolution and we got no control of the composition yet
 
 First we need to create the segmentation annotation for the leonid afremov paintings
 
-Just like the sflcker dataset
+Just like the sflickr dataset
 
 Luckily the extract_segmentation.py under scripts folder could do the trick, right ?
 
@@ -315,7 +315,7 @@ To some degrees, we are already possible to draw a painting
 
 1. Looks like a oil painting by leonid afremov (style)
 2. Composition controlled as we wish, but not breaking freely on all object catagories (composition)
-3. Complete training with only a few data avaliable (only 600 paintings)
+3. Complete training with only a few data available (only 600 paintings)
 4. Sample on higher resolution
 
 ## References

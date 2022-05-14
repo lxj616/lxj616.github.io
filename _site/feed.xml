@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-14T17:50:11+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Reviving Leonid Afremov® Paintings</title><link href="http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings.html" rel="alternate" type="text/html" title="Reviving Leonid Afremov® Paintings" /><published>2021-09-26T21:56:52+08:00</published><updated>2021-09-26T21:56:52+08:00</updated><id>http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings.html">&lt;h1 id=&quot;reviving-leonid-afremov-paintings&quot;&gt;Reviving Leonid Afremov® Paintings&lt;/h1&gt;
+
+&lt;p&gt;Leonid Afremov ®(born 12 July 1955 in Vitebsk, Belarus - Died August 19th 2019 , Playa Del Carmen, Quintana Roo, Mexico) is a Russian–Israeli modern impressionistic artist who works mainly with a palette knife and oils.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/13cb81d59a5e6608f5c8d9f936a85fbf.jpg&quot; alt=&quot;Leonid Afremov With His Artwork&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Using his unique painting technique and unmistakable blotchy, dotty style, Afremov created paintings that seem to explode into millions of bright colors.&lt;/p&gt;
+
+&lt;p&gt;I have been admired his talent for years, the bright color caught my eyes and also raised my interest, does recently developed neural network algorithms have the ability to create such art ?&lt;/p&gt;
+
+&lt;h2 id=&quot;results-from-vqgan--conditional-transformer&quot;&gt;Results From VQGAN &amp;amp; Conditional Transformer&lt;/h2&gt;
+
+&lt;p&gt;https://github.com/CompVis/taming-transformers&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/s04.png.jpg&quot; alt=&quot;Composition mixed two artwork&quot; /&gt;
+&lt;img src=&quot;/assets/s06.png.jpg&quot; alt=&quot;Composition according to original artwork&quot; /&gt;
+&lt;img src=&quot;/assets/s07.png.jpg&quot; alt=&quot;Composition enlarged canvas size&quot; /&gt;
+&lt;img src=&quot;/assets/s10.png.jpg&quot; alt=&quot;Composition enlarged non consistently&quot; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;mixed two artwork compositions&lt;/li&gt;
+  &lt;li&gt;Composition according to original artwork, slightly enlarged canvas&lt;/li&gt;
+  &lt;li&gt;Composition enlarged canvas size linearly&lt;/li&gt;
+  &lt;li&gt;Composition enlarged and free draw with imagination&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;how-does-the-painting-colors-work&quot;&gt;How does the painting colors work&lt;/h2&gt;
+
+&lt;p&gt;Yes, it’s really bright and vibrant, but why ?&lt;/p&gt;
+
+&lt;p&gt;Normally speaking, a night should be dark and gloomy, obviously&lt;/p&gt;
+
+&lt;p&gt;And with great contrast, there are lights so bright, and&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;To make grounds bright and vibrant, there must be rainy weather, reflects the street light&lt;/li&gt;
+  &lt;li&gt;Or choose water to make reflections&lt;/li&gt;
+  &lt;li&gt;The tree leaves can reflect street light colors, and usually covers the sky&lt;/li&gt;
+  &lt;li&gt;Don’t make the sky total dark, some dark blue serves well&lt;/li&gt;
+  &lt;li&gt;Buildings at night combined with street light&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;So far so good, these things are cool for a colorful night&lt;/p&gt;
+
+&lt;p&gt;Let’s say, to get a painting done with this vibrant color, we need&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;road&lt;/li&gt;
+  &lt;li&gt;water&lt;/li&gt;
+  &lt;li&gt;trees&lt;/li&gt;
+  &lt;li&gt;sky&lt;/li&gt;
+  &lt;li&gt;buildings&lt;/li&gt;
+  &lt;li&gt;street light&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;And not other fancy catagories, we will explain this later&lt;/p&gt;
+
+&lt;h2 id=&quot;how-does-the-painting-be-composed&quot;&gt;How does the painting be composed&lt;/h2&gt;
+
+&lt;p&gt;But wait, a mixture of those stuff catagories composed randomly counld not cast the magic, I have failed lots of times figuring out why&lt;/p&gt;
+
+&lt;p&gt;Q1: How to make the ‘road’ section exactly a third of the canvas, matching the perfect ratio&lt;/p&gt;
+
+&lt;p&gt;A1: Give a low angle shot near the ground, imagine you are sitting on the ground&lt;/p&gt;
+
+&lt;p&gt;Q2: The sky area is dark, how do we make it brighter&lt;/p&gt;
+
+&lt;p&gt;A2: Make the tree leaves cover the sky, reflect the street light, autumn or something&lt;/p&gt;
+
+&lt;p&gt;Q3: Street light could not possibly have that brightness to lit up all sky all leaves&lt;/p&gt;
+
+&lt;p&gt;A3: Nobody cares, just draw a few street light symbolically&lt;/p&gt;
+
+&lt;p&gt;So think about these, we got&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;There could be low angle shot near the ground, surely affects everything all stuff catagories, so don’t compose low angle road with normal angle buildings&lt;/li&gt;
+  &lt;li&gt;Trees are everywhere, designed as a brighter sky alternative, there wouldn’t be colorful sky in large area alone&lt;/li&gt;
+  &lt;li&gt;Street light catagory does not decide the overall lighting, the whole canvas will be lit up even without any street light&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Let’s see how these affect our experiment&lt;/p&gt;
+
+&lt;h2 id=&quot;training-to-paint&quot;&gt;Training To Paint&lt;/h2&gt;
+
+&lt;p&gt;https://github.com/CompVis/taming-transformers&lt;/p&gt;
+
+&lt;p&gt;Using custom_vqgan.yaml on collected leonid afremov paintings with following augmentations&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;All leonid afremov paintings are resized to smallest side size 460&lt;/li&gt;
+  &lt;li&gt;Enable random crop, with a size of 256x256&lt;/li&gt;
+  &lt;li&gt;Enable random flip&lt;/li&gt;
+  &lt;li&gt;Disable color jitter, rotation&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;And trained on one single GTX1080 Ti GPU, batch 1 (if you got better GPU, try more), around 1,000,000 iters&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/vqgan.jpg&quot; alt=&quot;vqgan&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;However, it’s low resolution and we got no control of the composition yet&lt;/p&gt;
+
+&lt;h2 id=&quot;training-to-compose&quot;&gt;Training To Compose&lt;/h2&gt;
+
+&lt;p&gt;First we need to create the segmentation annotation for the leonid afremov paintings&lt;/p&gt;
+
+&lt;p&gt;Just like the sflickr dataset&lt;/p&gt;
+
+&lt;p&gt;Luckily the extract_segmentation.py under scripts folder could do the trick, right ?&lt;/p&gt;
+
+&lt;p&gt;This script fetch pretrained deeplabv2 model to extract segmentation from the raw image&lt;/p&gt;
+
+&lt;p&gt;But sadly, it performs really poor on artistic paintings, especially color vibrant oil paintings&lt;/p&gt;
+
+&lt;p&gt;So I handcrafted 25% amount of annotations for the leonid afremov paintings, then trained a segmentation deeplab model to do the rest&lt;/p&gt;
+
+&lt;p&gt;https://github.com/kazuto1011/deeplab-pytorch&lt;/p&gt;
+
+&lt;p&gt;Got the segmentation annotations at last&lt;/p&gt;
+
+&lt;p&gt;Then we train a cond model with sflckr_cond_stage.yaml, it was fast, it converges really quick&lt;/p&gt;
+
+&lt;p&gt;And finally use the previous vqgan &amp;amp;&amp;amp; cond_stage model, to train the final Net2NetTransformer (See https://arxiv.org/abs/2012.09841 for why)&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;model:
+  base_learning_rate: 4.5e-06
+  target: taming.models.cond_transformer.Net2NetTransformer
+  params:
+    first_stage_key: image
+    cond_stage_key: segmentation
+    transformer_config:
+      target: taming.modules.transformer.mingpt.GPT
+      params:
+        vocab_size: 1024
+        block_size: 512
+        n_layer: 24
+        n_head: 16
+        n_embd: 1024
+    first_stage_config:
+      target: taming.models.vqgan.VQModel
+      params:
+        embed_dim: 256
+        n_embed: 1024
+        ddconfig:
+          double_z: false
+          z_channels: 256
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult:
+          - 1
+          - 1
+          - 2
+          - 2
+          - 4
+          num_res_blocks: 2
+          attn_resolutions:
+          - 16
+          dropout: 0.0
+        lossconfig:
+          target: taming.modules.losses.DummyLoss
+    cond_stage_config:
+      target: taming.models.vqgan.VQModel
+      params:
+        embed_dim: 256
+        n_embed: 1024
+        image_key: segmentation
+        ddconfig:
+          double_z: false
+          z_channels: 256
+          resolution: 256
+          in_channels: 182
+          out_ch: 182
+          ch: 128
+          ch_mult:
+          - 1
+          - 1
+          - 2
+          - 2
+          - 4
+          num_res_blocks: 2
+          attn_resolutions:
+          - 16
+          dropout: 0.0
+        lossconfig:
+          target: taming.modules.losses.DummyLoss
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;During training, I enabled shift_segmentation=True to deal with 255 unlabeled data, so when sampling add &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;segmentation = segmentation + 1&lt;/code&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;sampling&quot;&gt;Sampling&lt;/h2&gt;
+
+&lt;p&gt;Prepare your own segmentation annotation file, beware these restrictions:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;You can not go too far from original painting compositions, modify the original segmentation is a good place to start with&lt;/li&gt;
+  &lt;li&gt;It can generate larger resolution images, but that does not mean larger object with tiny details, enlarge the canvas size but not object size&lt;/li&gt;
+  &lt;li&gt;Don’t try to compose wrong catagories together, remember the low angle magic stuff we talked about earlier ?&lt;/li&gt;
+  &lt;li&gt;It will always generate similar contents compared to original paintings, like the previous shown second one, it nearly reconstruct the original painting, you can not draw something ‘that original’ from leonid afremov himself&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;If training with shift_segmentation, full script as follows:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#!/usr/bin/env python3
+import datetime
+
+from omegaconf import OmegaConf
+config_path = &quot;logs/2021-09-23T01-40-23_lxj616_net2net_leonid/configs/2021-09-23T01-40-23-project.yaml&quot;
+config = OmegaConf.load(config_path)
+import yaml
+print(yaml.dump(OmegaConf.to_container(config)))
+
+from taming.models.cond_transformer import Net2NetTransformer
+model = Net2NetTransformer(**config.model.params)
+
+import torch
+ckpt_path = &quot;logs/2021-09-23T01-40-23_lxj616_net2net_leonid/checkpoints/last.ckpt&quot;
+sd = torch.load(ckpt_path, map_location=&quot;cpu&quot;)[&quot;state_dict&quot;]
+missing, unexpected = model.load_state_dict(sd, strict=False)
+
+model.cuda().eval()
+torch.set_grad_enabled(False)
+
+from PIL import Image
+import numpy as np
+#segmentation_path = &quot;data/sflckr_segmentations/norway/25735082181_999927fe5a_b.png&quot;
+segmentation_path = &quot;lxj616_seg/lxj616_leonid_02.png&quot;
+segmentation = Image.open(segmentation_path)
+segmentation = np.array(segmentation).astype(np.uint8)
+segmentation = segmentation+1
+segmentation = np.eye(182)[segmentation]
+segmentation = torch.tensor(segmentation.transpose(2,0,1)[None]).to(dtype=torch.float32, device=model.device)
+
+c_code, c_indices = model.encode_to_c(segmentation)
+print(&quot;c_code&quot;, c_code.shape, c_code.dtype)
+print(&quot;c_indices&quot;, c_indices.shape, c_indices.dtype)
+assert c_code.shape[2]*c_code.shape[3] == c_indices.shape[1]
+segmentation_rec = model.cond_stage_model.decode(c_code)
+
+codebook_size = config.model.params.first_stage_config.params.embed_dim
+z_indices_shape = c_indices.shape
+z_code_shape = c_code.shape
+z_indices = torch.randint(codebook_size, z_indices_shape, device=model.device)
+x_sample = model.decode_to_img(z_indices, z_code_shape)
+
+import time
+
+idx = z_indices
+idx = idx.reshape(z_code_shape[0],z_code_shape[2],z_code_shape[3])
+
+cidx = c_indices
+cidx = cidx.reshape(c_code.shape[0],c_code.shape[2],c_code.shape[3])
+
+def save_image(s):
+  s = s.detach().cpu().numpy().transpose(0,2,3,1)[0]
+  s = ((s+1.0)*127.5).clip(0,255).astype(np.uint8)
+  s = Image.fromarray(s)
+  s.save(&quot;/workdir/tmp/sample_out_top10_&quot; + str(datetime.datetime.now().time())  + &quot;.png&quot;)
+
+#temperature = 1.0
+temperature = 0.7
+top_k = 10
+update_every = 50
+
+start_t = time.time()
+for i in range(0, z_code_shape[2]-0):
+  if i &amp;lt;= 8:
+    local_i = i
+  elif z_code_shape[2]-i &amp;lt; 8:
+    local_i = 16-(z_code_shape[2]-i)
+  else:
+    local_i = 8
+  for j in range(0,z_code_shape[3]-0):
+    if j &amp;lt;= 8:
+      local_j = j
+    elif z_code_shape[3]-j &amp;lt; 8:
+      local_j = 16-(z_code_shape[3]-j)
+    else:
+      local_j = 8
+
+    i_start = i-local_i
+    i_end = i_start+16
+    j_start = j-local_j
+    j_end = j_start+16
+    
+    patch = idx[:,i_start:i_end,j_start:j_end]
+    patch = patch.reshape(patch.shape[0],-1)
+    cpatch = cidx[:, i_start:i_end, j_start:j_end]
+    cpatch = cpatch.reshape(cpatch.shape[0], -1)
+    patch = torch.cat((cpatch, patch), dim=1)
+    logits,_ = model.transformer(patch[:,:-1])
+    logits = logits[:, -256:, :]
+    logits = logits.reshape(z_code_shape[0],16,16,-1)
+    logits = logits[:,local_i,local_j,:]
+
+    logits = logits/temperature
+
+    if top_k is not None:
+      logits = model.top_k_logits(logits, top_k)
+
+    probs = torch.nn.functional.softmax(logits, dim=-1)
+    idx[:,i,j] = torch.multinomial(probs, num_samples=1)
+
+    step = i*z_code_shape[3]+j
+    #if step%update_every==0 or step==z_code_shape[2]*z_code_shape[3]-1:
+    if step==z_code_shape[2]*z_code_shape[3]-1:
+      x_sample = model.decode_to_img(idx, z_code_shape)
+      print(f&quot;Time: {time.time() - start_t} seconds&quot;)
+      print(f&quot;Step: ({i},{j}) | Local: ({local_i},{local_j}) | Crop: ({i_start}:{i_end},{j_start}:{j_end})&quot;)
+      save_image(x_sample)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The result will be saved to /workdir/tmp , feel free to modify these paths&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/lxj616_leonid_05.jpg&quot; alt=&quot;mask random draw&quot; /&gt;
+&lt;img src=&quot;/assets/s10.png.jpg&quot; alt=&quot;Composition enlarged non consistently&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;To some degrees, we are already possible to draw a painting&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Looks like a oil painting by leonid afremov (style)&lt;/li&gt;
+  &lt;li&gt;Composition controlled as we wish, but not breaking freely on all object catagories (composition)&lt;/li&gt;
+  &lt;li&gt;Complete training with only a few data available (only 600 paintings)&lt;/li&gt;
+  &lt;li&gt;Sample on higher resolution&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;p&gt;Leonid Afremov photo collected from: https://www.pinterest.com.mx/pin/318489004868497967/&lt;/p&gt;
+
+&lt;p&gt;https://afremov.com/farewell-to-artist-leonid-afremov.html&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{esser2020taming,
+      title={Taming Transformers for High-Resolution Image Synthesis}, 
+      author={Patrick Esser and Robin Rombach and Björn Ommer},
+      year={2020},
+      eprint={2012.09841},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Leonid Afremov® is a trademark All Rights Reserved  ® © TM R https://afremov.com/Trademark.html&lt;/p&gt;
+
+&lt;p&gt;All painting image used for training collected from fineartamerica.com low resolution review, with watermark on image, training painting image and pretrained model are not provided in this article&lt;/p&gt;
+
+&lt;p&gt;Generated machine learning image are highly similar with Leonid Afremov original paintings, but not identical, for academical research only, author of this article does not affiliate with Leonid Afremov®, please do not redistribute the machine generated image either&lt;/p&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Reviving Leonid Afremov® Paintings</summary></entry></feed>
