@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Keypoint Based Anime Generation With Additional CLIP Guided Tuning | Something I found</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Keypoint Based Anime Generation With Additional CLIP Guided Tuning" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Keypoint Based Anime Generation With Additional CLIP Guided Tuning" />
+<meta property="og:description" content="Keypoint Based Anime Generation With Additional CLIP Guided Tuning" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html" />
+<meta property="og:site_name" content="Something I found" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-14T18:36:10+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Keypoint Based Anime Generation With Additional CLIP Guided Tuning" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Keypoint Based Anime Generation With Additional CLIP Guided Tuning","dateModified":"2022-05-14T18:36:10+08:00","datePublished":"2022-05-14T18:36:10+08:00","url":"http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html"},"description":"Keypoint Based Anime Generation With Additional CLIP Guided Tuning","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Something I found" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Something I found</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Keypoint Based Anime Generation With Additional CLIP Guided Tuning</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-05-14T18:36:10+08:00" itemprop="datePublished">May 14, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="keypoint-based-anime-generation-with-additional-clip-guided-tuning">Keypoint Based Anime Generation With Additional CLIP Guided Tuning</h1>
+
+<p>Make anime drawings with a selective pose and text captioning, is now possible</p>
+
+<p>Well… to be precisely, It has been possible in theory for many years, but getting such a task done requires so much computing power</p>
+
+<p>Or, does it ?</p>
+
+<p>vq-f16 cond_transformer (real world pose keypoints):</p>
+
+<p><img src="/assets/00019.jpg" alt="VQGAN f16 With Conditional Transformer" /></p>
+
+<p><img src="/assets/00055.jpg" alt="VQGAN f16 With Conditional Transformer 2" /></p>
+
+<p>vq-f4 latent-diffusion (pose from the training set, keypoints, input, reconstruction, ddim progressive row):</p>
+
+<p><img src="/assets/ldm_example.jpg" alt="VQGAN f4 With latent diffusion" /></p>
+
+<p>To avoid possible confusion, the image above is cherrypicked for better illustration of diffusion models, and is from the training set, result from testing the vq-f4 ldm model with real world poses are shown in below sections</p>
+
+<h2 id="possible-for-low-computing-scenarios">Possible for low computing scenarios</h2>
+
+<p>I have been testing different models &amp; configs to get this done with my single RTX 3090 Ti and very limited human lifespan</p>
+
+<p><strong>Finally I made it possible to train within a week (1 day for vq-f4 and 4 days for latent-diffusion as optimal, however I continue to observe the overfitting for another 3 days), and I also tried some extreme settings such as vq-f8 + 1/3 dataset with no luck</strong></p>
+
+<p>Here are the specs and models I experiments on:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Model</th>
+      <th>Spec</th>
+      <th>Dataset</th>
+      <th>Time</th>
+      <th>Note</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>cond_transformer</td>
+      <td>vq-f16</td>
+      <td>363k</td>
+      <td>20d</td>
+      <td>vanilla first attempt</td>
+    </tr>
+    <tr>
+      <td>ddpm</td>
+      <td>vq-f4</td>
+      <td>363k</td>
+      <td>8d</td>
+      <td>overfitting at day 5, 20 epochs</td>
+    </tr>
+    <tr>
+      <td>ddpm</td>
+      <td>vq-f8</td>
+      <td>101k</td>
+      <td>4d</td>
+      <td>too less data harms training</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Please do remember these experiments are not with best optimal settings, some training time are redundant, dataset cleaning a little overhead, and will discuss what went wrong in the following blog entries</p>
+
+<p>A glance at the cherry-picked results for each spec</p>
+
+<ol>
+  <li>vq-f16 ViT <img src="/assets/00019_1_40.jpg" alt="vq-f16 cond_transformer" /></li>
+  <li>vq-f4 ddpm <img src="/assets/000068_1.jpg" alt="vq-f4 ddpm" /></li>
+  <li>vq-f8 ddpm <img src="/assets/000034_1.jpg" alt="vq-f8 ddpm" /></li>
+</ol>
+
+<p>vq-f4 / vq-f8 are easily converge in several epochs, and vq-f16 using 256 channels reconstruction image seems to be not improving after two weeks, and I used a small batch of 4 so vq-f16 trains much longer</p>
+
+<p>diffusion model for 64x64 spartial size I trained for 7 days, around 32 epochs, overfitting at around day 4, 20 epochs</p>
+
+<p>I found that the vq-f4 ddpm model outperforms vq-f16 cond_transformer, even with half the training time altogether, suggesting the vq-f16 hit its limit long before reaching 20 days, the loss is still decreasing, weird</p>
+
+<p>Without cherry-picking, vq-f4 ddpm generates semantically consistent poses for the given condition, while vq-f16 cond_transformer could sometimes generate a total mess</p>
+
+<p>But when using CLIP Guided tuning, vq-f16 is semantically better than vq-f8 and CLIP almost doesn’t work with vq-f4, tests as below</p>
+
+<h2 id="clip-guided-tuning-with-model-generated-anime-images">CLIP guided tuning with model generated anime images</h2>
+
+<p>A glance at the CLIP guided tuning example for each specs (using “colorful” as the magic word)</p>
+
+<ol>
+  <li>vq-f16 ViT <img src="/assets/colorful_f16.jpg" alt="vq-f16 cond_transformer" /></li>
+  <li>vq-f4 ddpm <img src="/assets/000010_1629_50.jpg" alt="vq-f4 ddpm" /></li>
+  <li>vq-f8 ddpm <img src="/assets/000034_1_100.jpg" alt="vq-f8 ddpm" /></li>
+</ol>
+
+<p>It’s pretty clear that vq-f8 is struggling to give different hair strands different color, but the semantic shape isn’t consistent around the large skirt region</p>
+
+<p>And as for vq-f4, CLIP with it seems to be operating pure pixel-wise, everywhere except the hair seems weird and without meaning, and the hair itself is not colorful, only partially getting vibrant</p>
+
+<p>It seems that the CLIP guidance alone does not composite the image semantically, to get better results, even with pre-composition from other models, the optimizing target lantent space is better style-based than composition-based</p>
+
+<h2 id="how-do-i-make-this-happen-under-low-computing-restrictions">How do I make this happen under low computing restrictions</h2>
+
+<p>In short, I learned it the hard way</p>
+
+<p>I’m gonna start writing a serie of blogs explaining the whole process, by timeline order as follows</p>
+
+<ol>
+  <li>Rethinking the Danbooru 2021 dataset</li>
+  <li>A closer look into the latent-diffusion repo, do better than just looking</li>
+  <li>The speed and quality trade-off for low computing scenarios</li>
+</ol>
+
+<h2 id="related-pose-keypoints-dataset-code-and-model-release">Related pose keypoints dataset, code and model release</h2>
+
+<p>Keypoints tar ball(more details in coming up posts):</p>
+
+<p><a href="https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing">https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing</a></p>
+
+<p>Code of the latent-diffusion fork repo with keypoints conditioning (pretrained vq/ldm models included in repo README):</p>
+
+<p><a href="https://github.com/lxj616/latent-diffusion">https://github.com/lxj616/latent-diffusion</a></p>
+
+<h2 id="citations">Citations</h2>
+
+<p>danbooru 2021 dataset originally contains 4.9m+ images, here I filtered out 363k subset, then further made a 101k tiny subset for further testing, https://www.gwern.net/Danbooru2021</p>
+
+<p>latent diffusion models trained using <a href="https://github.com/CompVis/latent-diffusion">https://github.com/CompVis/latent-diffusion</a> , modifications on keypoints conditioning</p>
+
+<p>vq regularized models trained using <a href="https://github.com/CompVis/taming-transformers">https://github.com/CompVis/taming-transformers</a> , no modifications</p>
+
+<p>CLIP guided tuning using <a href="https://twitter.com/RiversHaveWings/status/1516582795438567424">https://twitter.com/RiversHaveWings/status/1516582795438567424</a> , directly on vq regularized model latents, not reranking the composition stage</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{danbooru2021,
+    author = {Anonymous and Danbooru community and Gwern Branwen},
+    title = {Danbooru2021: A Large-Scale Crowdsourced and Tagged Anime Illustration Dataset},
+    howpublished = {\url{https://www.gwern.net/Danbooru2021}},
+    url = {https://www.gwern.net/Danbooru2021},
+    type = {dataset},
+    year = {2022},
+    month = {January},
+    timestamp = {2022-01-21},
+    note = {Accessed: DATE} }
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{esser2020taming,
+      title={Taming Transformers for High-Resolution Image Synthesis}, 
+      author={Patrick Esser and Robin Rombach and Björn Ommer},
+      year={2020},
+      eprint={2012.09841},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{https://doi.org/10.48550/arxiv.2204.08583,
+  doi = {10.48550/ARXIV.2204.08583}, 
+  url = {https://arxiv.org/abs/2204.08583},
+  author = {Crowson, Katherine and Biderman, Stella and Kornis, Daniel and Stander, Dashiell and Hallahan, Eric and Castricato, Louis and Raff, Edward},
+  keywords = {Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {VQGAN-CLIP: Open Domain Image Generation and Editing with Natural Language Guidance},
+  publisher = {arXiv},
+  year = {2022},
+  copyright = {Creative Commons Attribution Share Alike 4.0 International}
+}
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Something I found</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Something I found</li><li><a class="u-email" href="mailto:lxj616cn@gmail.com">lxj616cn@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lxj616</span></a></li><li><a href="https://www.twitter.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">lxj616</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>There is no description for this lxj616&#39;s blog, lazy dude, nah</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

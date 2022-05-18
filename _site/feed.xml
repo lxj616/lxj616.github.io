@@ -1,4 +1,644 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-14T17:50:11+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Reviving Leonid Afremov® Paintings</title><link href="http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings.html" rel="alternate" type="text/html" title="Reviving Leonid Afremov® Paintings" /><published>2021-09-26T21:56:52+08:00</published><updated>2021-09-26T21:56:52+08:00</updated><id>http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings.html">&lt;h1 id=&quot;reviving-leonid-afremov-paintings&quot;&gt;Reviving Leonid Afremov® Paintings&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-05-18T14:11:17+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking</title><link href="http://localhost:4000/jekyll/update/2022/05/16/A-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking.html" rel="alternate" type="text/html" title="A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking" /><published>2022-05-16T14:16:02+08:00</published><updated>2022-05-16T14:16:02+08:00</updated><id>http://localhost:4000/jekyll/update/2022/05/16/A-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/05/16/A-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking.html">&lt;h1 id=&quot;a-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking&quot;&gt;A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking&lt;/h1&gt;
+
+&lt;p&gt;The two stage compress-then-diffusion boosts training efficiency dramatically, which made low computing art creations possible&lt;/p&gt;
+
+&lt;p&gt;For those readers who aren’t familiar with &lt;a href=&quot;https://github.com/CompVis/latent-diffusion&quot;&gt;https://github.com/CompVis/latent-diffusion&lt;/a&gt; , please see &lt;a href=&quot;https://arxiv.org/abs/2112.10752&quot;&gt;High-Resolution Image Synthesis with Latent Diffusion Models&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;I would assume that you already tried or is going to try out this model-combo for your own artistic datasets&lt;/p&gt;
+
+&lt;p&gt;The authors already released some pretrained vq/kl regularized autoencoder models, &lt;strong&gt;If your dataset looks like openimages dataset, or mathematically speaking your dataset have a similar visual feature distribution with the openimages dataset, then you’re in luck, just grab one pretrained autoencoder and train your ldm with demo configs&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;But what if your own dataset is visually very not similar from openimages, for example, danbooru anime dataset ?&lt;/p&gt;
+
+&lt;h2 id=&quot;the-pretrained-autoencoder-is-not-a-silver-bullet&quot;&gt;The pretrained autoencoder is not a silver bullet&lt;/h2&gt;
+
+&lt;p&gt;Let’s give the pretrained vq-f4 a reconstruction shot at danbooru images&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/151115.jpg&quot; alt=&quot;151115&quot; /&gt;
+&lt;img src=&quot;/assets/151115_rec.jpg&quot; alt=&quot;151115_rec&quot; /&gt;
+&lt;img src=&quot;/assets/80100.jpg&quot; alt=&quot;80100&quot; /&gt;
+&lt;img src=&quot;/assets/80100_rec.jpg&quot; alt=&quot;80100_rec&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Hmmm, the eyes are a little off, but it looks kinda fine&lt;/p&gt;
+
+&lt;p&gt;Then the pretrained vq-f8:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/151115.jpg&quot; alt=&quot;151115&quot; /&gt;
+&lt;img src=&quot;/assets/151115_rec_f8.jpg&quot; alt=&quot;151115_rec_f8&quot; /&gt;
+&lt;img src=&quot;/assets/80100.jpg&quot; alt=&quot;80100&quot; /&gt;
+&lt;img src=&quot;/assets/80100_rec_f8.jpg&quot; alt=&quot;80100_rec_f8&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Oh no, this is giving me nightmare&lt;/p&gt;
+
+&lt;p&gt;So there is no need to test out the vq-f16, vq-f8 is compressing way too much&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;The question is: is the pretrained vq-f4 on openimages good enough for danbooru dataset ?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Well, considering I already found that re-train a vq-f4 only takes one or two epochs, it’s really not necessery to endure with the eye detail gliches, as well as the biased codebook distribution&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;But even if the autoencoder training takes long, I still wouldn’t chose to use the pretrained vq-f4 on danbooru dataset, not only because the ‘best reconstruction’ is not good enough, the distribution of the codebook entries are very different than the danbooru dataset as well, it means that somewhere between a dress fiber texture code and hair strand texture code, there is a squirrel fur texture code should not be used, but will be optimized during later diffusion training, I have no idea what consequence it shall make but definitely not favoring it&lt;/p&gt;
+
+&lt;h2 id=&quot;selecting-a-proper-autoencoder-config&quot;&gt;Selecting a proper autoencoder config&lt;/h2&gt;
+
+&lt;p&gt;I have tried vq-f16/vq-f8/vq-f4 with the default config and the trainable parameter count are near identical due to gpu limit&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Generally speaking, if you are creating 256x256 images, vq-f4 leads to a 64x64 diffusion model training, after my experiments, this is the best combo config that works really well&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;And after trying vq-f8, I found it hard to sustain the reconstrution quality without ramping up model abilities, with the same trainable parameters, it does’t do details well, another problem is if 64x64 diffusion model is training as fast as in 5 days on my case, spend more time on autoencoders in exchange for a easier diffusion training does not seem to be worth it&lt;/p&gt;
+
+&lt;p&gt;I also tried vq-f16 on my first attempt, nah… , it’s working, but after two weeks time, it doesn’t seem to be more impressive, all the gloomy details drives me mad, compared with vq-f4 + 64x64 diffusion, it’s totally not worth it, unless you wanna try 1024x1024 high resolution image generation, which makes vq-f16 + 64x64 diffusion seems proper, but that shall be a different story then&lt;/p&gt;
+
+&lt;h2 id=&quot;conditioning-on-keypoints&quot;&gt;Conditioning on keypoints&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/CompVis/latent-diffusion&quot;&gt;https://github.com/CompVis/latent-diffusion&lt;/a&gt; already give examples about how to use cross attention to do conditional training, such as conditioning on image/class_label/object_center_point/depth_map etc, and I just made the 17 keypoints into a [1, 17] tensor, just as the object center point hack&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    def tokenize_coordinates(self, x: float, y: float, dim:int) -&amp;gt; int:
+        &quot;&quot;&quot;
+        Express 2d coordinates with one number.
+        Example: assume self.no_tokens = 16, then no_sections = 4:
+        0  0  0  0
+        0  0  #  0
+        0  0  0  0
+        0  0  0  x
+        Then the # position corresponds to token 6, the x position to token 15.
+        @param x: float in [0, 1]
+        @param y: float in [0, 1]
+        @return: discrete tokenized coordinate
+        &quot;&quot;&quot;
+        #x_discrete = int(round(x * (self.512 - 1)))
+        #y_discrete = int(round(y * (self.512 - 1)))
+        if x &amp;gt; (dim - 1):
+            x = (dim - 1)
+        if y &amp;gt; (dim - 1):
+            y = (dim - 1)
+        if x &amp;lt; 0:
+            x = 0
+        if y &amp;lt; 0:
+            y = 0
+        return int(round(x)) + int(round(y) * dim)
+
+    def coordinates_from_token(self, token: int, dim: int) -&amp;gt; (float, float):
+        x = token % dim
+        y = token // dim
+        return x, y
+
+    def build_tensor_from_kps(self, kps, dim):
+        kps_names = ['nose',
+                     'eye_left',
+                     'eye_right',
+                     'ear_left',
+                     'ear_right',
+                     'shoulder_left',
+                     'shoulder_right',
+                     'elbow_left',
+                     'elbow_right',
+                     'wrist_left',
+                     'wrist_right',
+                     'hip_left',
+                     'hip_right',
+                     'knee_left',
+                     'knee_right',
+                     'ankle_left',
+                     'ankle_right']
+        tokens = []
+        for name in kps_names:
+           x = kps[name][0]
+           y = kps[name][1]
+           if dim != 512:
+               x = x // (512/dim)
+               y = y // (512/dim)
+           _token = self.tokenize_coordinates(x, y, dim)
+           tokens.append(_token)
+        #return LongTensor(tokens)
+        return Tensor(tokens)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;A custom dataloader to load the json keypoints file&lt;/li&gt;
+  &lt;li&gt;A DummyEncoder to construct the [1, 17] tensor from keypoints&lt;/li&gt;
+  &lt;li&gt;Add keypoints option to the conditioning key for the model, modify log_images function to log conditioning keypoints as well&lt;/li&gt;
+  &lt;li&gt;Adapt the config to use keypoints conditioning and enable spartial transformer cross attention options&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The complete code can be found at &lt;a href=&quot;https://github.com/lxj616/latent-diffusion&quot;&gt;https://github.com/lxj616/latent-diffusion&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;training-the-diffusion-model&quot;&gt;Training the diffusion model&lt;/h2&gt;
+
+&lt;p&gt;I decreased the model_channels to 160 (from 256) to save vram for larger batches, everything else is more or less copied from example config&lt;/p&gt;
+
+&lt;p&gt;This config file can be found at configs/latent-diffusion/danbooru-keypoints-ldm-vq-4.yaml in my latent-diffusion fork repo&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;model:
+  base_learning_rate: 2.0e-06
+  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  params:
+    linear_start: 0.0015
+    cond_stage_key: keypoints
+    linear_end: 0.0195
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    first_stage_key: image
+    conditioning_key: crossattn
+    image_size: 64
+    channels: 3
+    monitor: val/loss_simple_ema
+    unet_config:
+      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        image_size: 64
+        in_channels: 3
+        out_channels: 3
+        model_channels: 160
+        attention_resolutions:
+        - 8
+        - 4
+        - 2
+        num_res_blocks: 2
+        channel_mult:
+        - 1
+        - 2
+        - 3
+        - 4
+        num_heads: 8
+        use_spatial_transformer: true
+        transformer_depth: 1
+        context_dim: 17
+        legacy: false
+    first_stage_config:
+      target: ldm.models.autoencoder.VQModelInterface
+      params:
+        embed_dim: 3
+        n_embed: 8192
+        ckpt_path: /workdir/taming-transformers/logs/2022-04-25T12-37-06_custom_vqgan/checkpoints/last.ckpt
+        ddconfig:
+          double_z: false
+          z_channels: 3
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult:
+          - 1
+          - 2
+          - 4
+          num_res_blocks: 2
+          attn_resolutions: []
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+    cond_stage_config:
+      target: ldm.modules.encoders.modules.DummyEncoder
+      params:
+        key: keypoints
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 32
+    num_workers: 8
+    wrap: false
+    train:
+      target: ldm.data.custom_616.CustomTrain
+      params:
+        training_images_list_file: /workdir/datasets/danbooru_tiny.list
+        size: 256
+    validation:
+      target: ldm.data.custom_616.CustomTest
+      params:
+        test_images_list_file: /workdir/datasets/danbooru_tiny_test.list
+        size: 256
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After 20 epochs of training, I suspect there is some overfitting, and keep observing until epoch 33, it became more and more obvious&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/progressive_row_gs-380000_e-000033_b-004988_cropped.jpg&quot; alt=&quot;overfitting&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The model is trying to denoise some tiny details in the last steps, only to make the details worse, this is very dataset specific, too much noise in the danbooru dataset make details impossible to refine, as well as lack of data in total&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;So by calculation 20 epochs is good enough, which is 2022-04-30 ~ 2022-05-04 (5 days), the vq-f4 training took a day, so this is within a week on a single 3090 Ti&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Maybe I should not have filtered the dataset too heavy losing too much slightly noisy data …&lt;/p&gt;
+
+&lt;h2 id=&quot;sample-using-pose-keypoints&quot;&gt;Sample using pose keypoints&lt;/h2&gt;
+
+&lt;p&gt;In short, parse the conditioning to ddim sampler, and you’ll get the conditioned output&lt;/p&gt;
+
+&lt;p&gt;There is a demo script at scripts/sample_pose_diffusion.py in my latent-diffusion fork repo&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;samples, intermediates = ddim.sample(steps, conditioning=cond, batch_size=bs, shape=shape, eta=eta, verbose=False,)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;And there are many hidden tricks that ddim already have, such as inpainting, priming on a different noise latent …&lt;/p&gt;
+
+&lt;p&gt;When I tried to illustrate the final output quality, &lt;strong&gt;I chose a real world pose example from a short video&lt;/strong&gt;, instead of using poses from the training/validation set, this is more fun and fair to demonstrate the model capabilities&lt;/p&gt;
+
+&lt;p&gt;cherry-picked:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/000068_1.jpg&quot; alt=&quot;vq-f4 ddpm&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;random sample:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/total_grid.jpg&quot; alt=&quot;random sample&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;However if you really need to generate better quality images, you can also consider &lt;strong&gt;the “truncation trick”&lt;/strong&gt; similar to stylegan/biggan, but in our case is to select &lt;strong&gt;“the most common top N poses”&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Ha, gotcha, there is no common pose in the dataset, the keypoints are way too scattered to be in common, there are total 17 points everywhere, how could they possible accidentally be the same ? The ‘pose available space’ is 87112285931760246646623899502532662132736 large(I regularized the coordinate to be within 16x16 grids each, math.pow(256, 17)), good luck finding a most common pose to get the trick done&lt;/p&gt;
+
+&lt;p&gt;The following pose is from the top row image in the training set, the generated output image is with similar pose but not identical with the training set image, there must be a similar image in the dataset though, if you don’t mind, selecting poses from the training set can give you better results, but not as fun as selecting real world poses to challenge the model, and to further improve the output quality by cheating, select a top common pose rather than random training set pose&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/ldm_example.jpg&quot; alt=&quot;VQGAN f4 With latent diffusion&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;failure-attempts&quot;&gt;Failure attempts&lt;/h2&gt;
+
+&lt;p&gt;I tried to further clean up the danbooru dataset subset, reducing the noisy images and try vq-f8 to get details right and blazing fast, ended up worse output quality due to lack of data, details see my last post about datasets&lt;/p&gt;
+
+&lt;p&gt;I tried to clean up anime image backgrounds, it wasn’t accurate enough, introduces new random image feature noises, not working&lt;/p&gt;
+
+&lt;p&gt;I forgot to set spartial transformer in the config, find that out after many days when the log image can be clearly distinguished, my heart is broken, especially when I see the code comment after carefully debug&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        if use_spatial_transformer:
+            assert context_dim is not None, 'Fool!! You forgot to include the dimension of your cross-attention conditioning...'
+
+        if context_dim is not None:
+            assert use_spatial_transformer, 'Fool!! You forgot to use the spatial transformer for your cross-attention conditioning...'
+            from omegaconf.listconfig import ListConfig
+            if type(context_dim) == ListConfig:
+                context_dim = list(context_dim)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;citations&quot;&gt;Citations&lt;/h2&gt;
+
+&lt;p&gt;latent diffusion models trained using &lt;a href=&quot;https://github.com/CompVis/latent-diffusion&quot;&gt;https://github.com/CompVis/latent-diffusion&lt;/a&gt; , modifications on keypoints conditioning&lt;/p&gt;
+
+&lt;p&gt;vq regularized models trained using &lt;a href=&quot;https://github.com/CompVis/taming-transformers&quot;&gt;https://github.com/CompVis/taming-transformers&lt;/a&gt; , no modifications&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{esser2020taming,
+      title={Taming Transformers for High-Resolution Image Synthesis}, 
+      author={Patrick Esser and Robin Rombach and Björn Ommer},
+      year={2020},
+      eprint={2012.09841},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking</summary></entry><entry><title type="html">Rethinking The Danbooru 2021 Dataset</title><link href="http://localhost:4000/jekyll/update/2022/05/15/rethinking-the-danbooru-2021-dataset.html" rel="alternate" type="text/html" title="Rethinking The Danbooru 2021 Dataset" /><published>2022-05-15T01:11:18+08:00</published><updated>2022-05-15T01:11:18+08:00</updated><id>http://localhost:4000/jekyll/update/2022/05/15/rethinking-the-danbooru-2021-dataset</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/05/15/rethinking-the-danbooru-2021-dataset.html">&lt;h1 id=&quot;rethinking-the-danbooru-2021-dataset&quot;&gt;Rethinking The Danbooru 2021 Dataset&lt;/h1&gt;
+
+&lt;p&gt;I trained a keypoint based anime generation model on top of the danbooru 2021 dataset, more specifically, on a filtered subset, and get some satisfying results&lt;/p&gt;
+
+&lt;p&gt;But after everything is done, the whole process need to be reviewed, I need to do backpropagation towards my mind and do better next time&lt;/p&gt;
+
+&lt;p&gt;So here comes the question: &lt;strong&gt;which problems are dataset related and how do they affect the later training process&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;addressing-the-known-problems-discussed-in-years&quot;&gt;Addressing the known problems discussed in years&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Hands have long been a weak point (https://www.gwern.net/Faces)&lt;/li&gt;
+  &lt;li&gt;The danbooru dataset is way too noisy (reddit user comments)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;To train a pose keypoints based model, a pose keypoints dataset is required, but not all danbooru dataset images is suitable for training&lt;/p&gt;
+
+&lt;h2 id=&quot;my-approach-to-aquire-a-cleaner-subset&quot;&gt;My approach to aquire a cleaner subset&lt;/h2&gt;
+
+&lt;p&gt;Let’s take a look at https://www.gwern.net/Danbooru2021 offical grid sample image&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/danbooru2020-512px-samples.jpg&quot; alt=&quot;danbooru2020-512px-samples.jpg&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Please be noted that this is from a SFW subset (around 3m+), and down-scaled to 512x512 already&lt;/p&gt;
+
+&lt;p&gt;For the scenario of “keypoints based” anime generation, it’s easy to tell most of the samples are &lt;strong&gt;not suitable for training&lt;/strong&gt;, naming a few:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;book grid line sketch manga&lt;/li&gt;
+  &lt;li&gt;multiple people&lt;/li&gt;
+  &lt;li&gt;a girl making weird poses that the feet is too big and no arms&lt;/li&gt;
+  &lt;li&gt;back facing the camera&lt;/li&gt;
+  &lt;li&gt;a landscape photo&lt;/li&gt;
+  &lt;li&gt;a calender cover&lt;/li&gt;
+  &lt;li&gt;the girl is holding a doll face, and all backgroud full of doll face&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Among the 10x10=100 samples, &lt;strong&gt;basic counting tells that &amp;lt; 20 samples meet the basic requirement&lt;/strong&gt; “is a portrait with pose keypoints”&lt;/p&gt;
+
+&lt;p&gt;So here we expect making a &lt;strong&gt;600k(20% of 3m)&lt;/strong&gt; subset and they may still not be suitable for training&lt;/p&gt;
+
+&lt;p&gt;Before I utilized CLIP text based filtering to clean the dataset, I found that 3m+ images is way too large for a deep learning model sweep (later I realized this is a misjudge)&lt;/p&gt;
+
+&lt;p&gt;And after labeling every unwanted sample image CLIP score, I choose a threshold (with human examine sampling) of 600k to be the intermediate subset of the description “is a portrait with pose keypoints”&lt;/p&gt;
+
+&lt;p&gt;Next I labeled all the 600k image samples with https://github.com/ShuhongChen/bizarre-pose-estimator , getting pose keypoints&lt;/p&gt;
+
+&lt;p&gt;Now it’s time for some basic data analysis to cluster the poses&lt;/p&gt;
+
+&lt;p&gt;As a example, here is plotting the “middle of the two hip keypoint” with dbscan clustering&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/Figure_1.png&quot; alt=&quot;Figure_1.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Turns out the dbscan clustering is totally unnecesary, just simply plot it and the answer is obvious&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;sometimes hip is out of the image scope, such as half portrait may only have top upper body, so y &amp;gt;= 512 is totally understandable&lt;/li&gt;
+  &lt;li&gt;when something went wrong with the image or pose-estimation model, random points are understandable, such as some weird four legged creature may have hip anywhere&lt;/li&gt;
+  &lt;li&gt;the dense area of the main distribution seems to be normal, regarding one single ‘hip position’ alone, are they good samples for training ?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Wait, I have a fun quiz about the fore-mentioned figure:&lt;/p&gt;
+
+&lt;p&gt;Under what circumstances should a anime &lt;strong&gt;have hips top of the image like y &amp;lt; 100&lt;/strong&gt; ?&lt;/p&gt;
+
+&lt;p&gt;Ans:&lt;/p&gt;
+
+&lt;details&gt;
+  &lt;summary&gt;Show the case&lt;/summary&gt;
+  &lt;p&gt; 
+  &lt;img src=&quot;/assets/2106.jpg&quot; /&gt;
+  &lt;/p&gt;
+&lt;/details&gt;
+
+&lt;p&gt;XD&lt;/p&gt;
+
+&lt;p&gt;Finally, applying several data analysis techniques, &lt;strong&gt;I finally got a 363k subset&lt;/strong&gt; which is ~50% smaller than the previous intermediate 600k subset, make sure every shoulder and wrist etc etc not placing too odd&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Maybe this filtering is a little bit overhead, sometimes I felt like this type of filtering does not eliminate most abnormal samples but hurt total available image count directly&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;rethink-a-cleaner-subset-is-not-clean-enough&quot;&gt;Rethink: A cleaner subset is not clean enough&lt;/h2&gt;
+
+&lt;p&gt;Here’s 20 random samples from the 363k subset&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/20_concat.jpg&quot; alt=&quot;20_concat.jpg&quot; /&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;top row 8/20 (40%) images seems to be near-unified portraits &lt;strong&gt;suitable for training&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;mid row 6/20 (30%) images seems to be &lt;strong&gt;questionable&lt;/strong&gt;, not sure if the model could refine details from such stylized complex-visual image&lt;/li&gt;
+  &lt;li&gt;bottom row 6/20 (30%) images is totally &lt;strong&gt;unacceptable&lt;/strong&gt;, it shall make the training unstable and semantically confused&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Now to recap the problems we mention earlier&lt;/p&gt;
+
+&lt;h3 id=&quot;hands-have-long-been-a-weak-point&quot;&gt;Hands have long been a weak point&lt;/h3&gt;
+
+&lt;p&gt;If your dataset only ~40% contains standard looking hands, and ~60% images the hand is holding some item or does not have hands at all, your model are not going to generate hands well&lt;/p&gt;
+
+&lt;p&gt;By intuition the next step is to further clean up the dataset, selecting only the appropriate 40% (top row as example), make it 140k in total and finally getting better results&lt;/p&gt;
+
+&lt;p&gt;Well, I tried, making a 101k subset out of the 364k subset, but I can not get it ‘selecting only the appropriate 40%’, by statistics they look alike, the best way I can come up with is to train another resnet model to label them, but this dataset is different from the leonid afremov dataset, I can hand craft segmentation 25% of the 600 paintings, but there is no way I tag sufficient percentage of this 363k dataset all by myself&lt;/p&gt;
+
+&lt;p&gt;I finally made a 101k subset towards ‘the most usual poses’ by statistics, and it does not do well, too less data regarding too much poses&lt;/p&gt;
+
+&lt;h3 id=&quot;the-danbooru-dataset-is-way-too-noisy&quot;&gt;The danbooru dataset is way too noisy&lt;/h3&gt;
+
+&lt;p&gt;Even with all the efforts to clean the dataset, in the final sampling stage, it is easy to spot totally undesirable outputs such as below&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/bad_sample_000032.jpg&quot; alt=&quot;bad_sample_000032.jpg&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There must be a cool white hair knight wearing leather armor so cool so dark in the dataset, and totally not like any of the anime cute girls wearing dresses&lt;/p&gt;
+
+&lt;p&gt;However, the pose is correct, at least, a cool white hair leather armor knight is still anime, I guess&lt;/p&gt;
+
+&lt;p&gt;In a different perspective, it also could meant that there isn’t enough similar images in the dataset, a dozen more leather armor knight images should allow the model to draw better&lt;/p&gt;
+
+&lt;p&gt;A more promising approach to deal with noisy dataset is to ramp up the model ability like TADNE “model size increase (more than doubles, to 1GB total)”, aydao did a good job on other hacks as well, but in my situation I chose to try the opposite, to make training time as low as 4~9 days with one single gpu thus can not afford to double the model size, at all, and as a consequence, I filtered out 90% of the dataset images instead of training on the full/intermediate dataset&lt;/p&gt;
+
+&lt;h2 id=&quot;unfinished-exploration&quot;&gt;Unfinished exploration&lt;/h2&gt;
+
+&lt;p&gt;If I were to do it again, with the lessions learnt in a hard way, I would carefully carry it out in the following order:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;CLIP filtering at the very first place, towards full 3m+ dataset, don’t do image feature clustering (didn’t mention in this article), just CLIP out the majority unwanted images, leave the rest for later procedures&lt;/li&gt;
+  &lt;li&gt;assume the first stage already filtered out more than half of the images, tag the rest with pose estimator https://github.com/ShuhongChen/bizarre-pose-estimator, filter them soft and gentle, don’t go too far&lt;/li&gt;
+  &lt;li&gt;if manual sampling from the subset observes obvious type of bad case, a lot, and assume CLIP doesn’t help in this particular case, do some coding to deal with it, example: too much black borders with too little content&lt;/li&gt;
+  &lt;li&gt;manually tag 1% of the dataset, train a reset model, testing 5% of the dataset, correct the prediction and re-train with 5% of the dataset, then testing 25% of the dataset, correct the prediction again then re-train on 25% of the dataset, get the whole dataset filtered (I tried this method to generate a 70k dataset on other experiments, it works really well, but time consuming), I guess this step could take weeks for a dataset as large as danbooru even pre-filtered into intermediate subset&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;As for the “image feature clustering”, I already regret doing so, it does not rule out the “white hair knight wearing leather armor” case, It does not deal with “too large black border too little content” case, and easy to spot weird images can be filtered either by CLIP or pose-estimator, the bottleneck is not the GPU speed, I found the reason of my slow inferencing speed is due to the USB hard drive I store the 3m+ images on, BTW, I lost all data on that drive later, one should never use USB hard drive to store massive amount of images&lt;/p&gt;
+
+&lt;p&gt;I assume that if everything went well, there would be a near 150k pose keypoint image subset, around 70k best quality images and 80k sort-of-complex images, and no white hair knight wearing leather armor !&lt;/p&gt;
+
+&lt;p&gt;Or if you got more computing power to spare, filter the dataset more gently, allow a slightly noisier but overall much larger dataset may improve training, my attempt training with a 101k subset(compared to 363k) ends up damaging overall generation quality&lt;/p&gt;
+
+&lt;p&gt;But that will be other warriors’ adventure, I’ll upload the 363k keypoints if anyone is interested, the filename is the image id, you could download the corresponding image from danbooru 2021 https://www.gwern.net/Danbooru2021, follow the webpage instructions and you can only download images with corresponding id in the shard, or download the whole SFW subset then fetch the image locally if wish not to read long instructions&lt;/p&gt;
+
+&lt;p&gt;The json file for each image contains 17 keypoints just like coco dataset, and is the output of https://github.com/ShuhongChen/bizarre-pose-estimator, you can generate your own image keypoints using this repo, one example below&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;{&quot;nose&quot;: [176.8, 256.0], &quot;eye_left&quot;: [150.4, 282.40000000000003], &quot;eye_right&quot;: [168.0, 247.20000000000002], &quot;ear_left&quot;: [150.4, 322.00000000000006], &quot;ear_right&quot;: [181.20000000000002, 234.0], &quot;shoulder_left&quot;: [238.4, 374.80000000000007], &quot;shoulder_right&quot;: [264.8, 251.60000000000002], &quot;elbow_left&quot;: [348.40000000000003, 361.6000000000001], &quot;elbow_right&quot;: [361.6000000000001, 251.60000000000002], &quot;wrist_left&quot;: [445.20000000000005, 427.6000000000001], &quot;wrist_right&quot;: [388.00000000000006, 225.20000000000002], &quot;hip_left&quot;: [533.2, 401.20000000000005], &quot;hip_right&quot;: [414.40000000000003, 286.80000000000007], &quot;knee_left&quot;: [352.80000000000007, 220.8], &quot;knee_right&quot;: [405.6000000000001, 150.4], &quot;ankle_left&quot;: [396.80000000000007, 128.4], &quot;ankle_right&quot;: [392.40000000000003, 128.4]}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To visualize, use the same way visualizing coco dataset, a example can be found in my forked latent-diffusion condition logging functions, which borrows from bizarre-pose-estimator code repo and is originally from coco dataset utilities&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/conditioning_gs-160000_e-000014_b-000904.jpg&quot; alt=&quot;conditioning keypoints log&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Keypoints tar ball:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing&quot;&gt;https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;citations&quot;&gt;Citations&lt;/h2&gt;
+
+&lt;p&gt;danbooru 2021 dataset originally contains 4.9m+ images, here I filtered out 363k subset, then further made a 101k tiny subset for further testing, https://www.gwern.net/Danbooru2021&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{danbooru2021,
+    author = {Anonymous and Danbooru community and Gwern Branwen},
+    title = {Danbooru2021: A Large-Scale Crowdsourced and Tagged Anime Illustration Dataset},
+    howpublished = {\url{https://www.gwern.net/Danbooru2021}},
+    url = {https://www.gwern.net/Danbooru2021},
+    type = {dataset},
+    year = {2022},
+    month = {January},
+    timestamp = {2022-01-21},
+    note = {Accessed: DATE} }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{https://doi.org/10.48550/arxiv.2108.01819,
+  doi = {10.48550/ARXIV.2108.01819},
+  url = {https://arxiv.org/abs/2108.01819},
+  author = {Chen, Shuhong and Zwicker, Matthias},
+  keywords = {Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {Transfer Learning for Pose Estimation of Illustrated Characters},
+  publisher = {arXiv},
+  year = {2021},
+  copyright = {Creative Commons Attribution 4.0 International}
+}
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Rethinking The Danbooru 2021 Dataset</summary></entry><entry><title type="html">Keypoint Based Anime Generation With Additional CLIP Guided Tuning</title><link href="http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html" rel="alternate" type="text/html" title="Keypoint Based Anime Generation With Additional CLIP Guided Tuning" /><published>2022-05-14T18:36:10+08:00</published><updated>2022-05-14T18:36:10+08:00</updated><id>http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html">&lt;h1 id=&quot;keypoint-based-anime-generation-with-additional-clip-guided-tuning&quot;&gt;Keypoint Based Anime Generation With Additional CLIP Guided Tuning&lt;/h1&gt;
+
+&lt;p&gt;Make anime drawings with a selective pose and text captioning, is now possible&lt;/p&gt;
+
+&lt;p&gt;Well… to be precisely, It has been possible in theory for many years, but getting such a task done requires so much computing power&lt;/p&gt;
+
+&lt;p&gt;Or, does it ?&lt;/p&gt;
+
+&lt;p&gt;vq-f16 cond_transformer (real world pose keypoints):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/00019.jpg&quot; alt=&quot;VQGAN f16 With Conditional Transformer&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/00055.jpg&quot; alt=&quot;VQGAN f16 With Conditional Transformer 2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;vq-f4 latent-diffusion (pose from the training set, keypoints, input, reconstruction, ddim progressive row):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/ldm_example.jpg&quot; alt=&quot;VQGAN f4 With latent diffusion&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;To avoid possible confusion, the image above is cherrypicked for better illustration of diffusion models, and is from the training set, result from testing the vq-f4 ldm model with real world poses are shown in below sections&lt;/p&gt;
+
+&lt;h2 id=&quot;possible-for-low-computing-scenarios&quot;&gt;Possible for low computing scenarios&lt;/h2&gt;
+
+&lt;p&gt;I have been testing different models &amp;amp; configs to get this done with my single RTX 3090 Ti and very limited human lifespan&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Finally I made it possible to train within a week (1 day for vq-f4 and 4 days for latent-diffusion as optimal, however I continue to observe the overfitting for another 3 days), and I also tried some extreme settings such as vq-f8 + 1/3 dataset with no luck&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Here are the specs and models I experiments on:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Model&lt;/th&gt;
+      &lt;th&gt;Spec&lt;/th&gt;
+      &lt;th&gt;Dataset&lt;/th&gt;
+      &lt;th&gt;Time&lt;/th&gt;
+      &lt;th&gt;Note&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;cond_transformer&lt;/td&gt;
+      &lt;td&gt;vq-f16&lt;/td&gt;
+      &lt;td&gt;363k&lt;/td&gt;
+      &lt;td&gt;20d&lt;/td&gt;
+      &lt;td&gt;vanilla first attempt&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;ddpm&lt;/td&gt;
+      &lt;td&gt;vq-f4&lt;/td&gt;
+      &lt;td&gt;363k&lt;/td&gt;
+      &lt;td&gt;8d&lt;/td&gt;
+      &lt;td&gt;overfitting at day 5, 20 epochs&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;ddpm&lt;/td&gt;
+      &lt;td&gt;vq-f8&lt;/td&gt;
+      &lt;td&gt;101k&lt;/td&gt;
+      &lt;td&gt;4d&lt;/td&gt;
+      &lt;td&gt;too less data harms training&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Please do remember these experiments are not with best optimal settings, some training time are redundant, dataset cleaning a little overhead, and will discuss what went wrong in the following blog entries&lt;/p&gt;
+
+&lt;p&gt;A glance at the cherry-picked results for each spec&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;vq-f16 ViT &lt;img src=&quot;/assets/00019_1_40.jpg&quot; alt=&quot;vq-f16 cond_transformer&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;vq-f4 ddpm &lt;img src=&quot;/assets/000068_1.jpg&quot; alt=&quot;vq-f4 ddpm&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;vq-f8 ddpm &lt;img src=&quot;/assets/000034_1.jpg&quot; alt=&quot;vq-f8 ddpm&quot; /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;vq-f4 / vq-f8 are easily converge in several epochs, and vq-f16 using 256 channels reconstruction image seems to be not improving after two weeks, and I used a small batch of 4 so vq-f16 trains much longer&lt;/p&gt;
+
+&lt;p&gt;diffusion model for 64x64 spartial size I trained for 7 days, around 32 epochs, overfitting at around day 4, 20 epochs&lt;/p&gt;
+
+&lt;p&gt;I found that the vq-f4 ddpm model outperforms vq-f16 cond_transformer, even with half the training time altogether, suggesting the vq-f16 hit its limit long before reaching 20 days, the loss is still decreasing, weird&lt;/p&gt;
+
+&lt;p&gt;Without cherry-picking, vq-f4 ddpm generates semantically consistent poses for the given condition, while vq-f16 cond_transformer could sometimes generate a total mess&lt;/p&gt;
+
+&lt;p&gt;But when using CLIP Guided tuning, vq-f16 is semantically better than vq-f8 and CLIP almost doesn’t work with vq-f4, tests as below&lt;/p&gt;
+
+&lt;h2 id=&quot;clip-guided-tuning-with-model-generated-anime-images&quot;&gt;CLIP guided tuning with model generated anime images&lt;/h2&gt;
+
+&lt;p&gt;A glance at the CLIP guided tuning example for each specs (using “colorful” as the magic word)&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;vq-f16 ViT &lt;img src=&quot;/assets/colorful_f16.jpg&quot; alt=&quot;vq-f16 cond_transformer&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;vq-f4 ddpm &lt;img src=&quot;/assets/000010_1629_50.jpg&quot; alt=&quot;vq-f4 ddpm&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;vq-f8 ddpm &lt;img src=&quot;/assets/000034_1_100.jpg&quot; alt=&quot;vq-f8 ddpm&quot; /&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;It’s pretty clear that vq-f8 is struggling to give different hair strands different color, but the semantic shape isn’t consistent around the large skirt region&lt;/p&gt;
+
+&lt;p&gt;And as for vq-f4, CLIP with it seems to be operating pure pixel-wise, everywhere except the hair seems weird and without meaning, and the hair itself is not colorful, only partially getting vibrant&lt;/p&gt;
+
+&lt;p&gt;It seems that the CLIP guidance alone does not composite the image semantically, to get better results, even with pre-composition from other models, the optimizing target lantent space is better style-based than composition-based&lt;/p&gt;
+
+&lt;h2 id=&quot;how-do-i-make-this-happen-under-low-computing-restrictions&quot;&gt;How do I make this happen under low computing restrictions&lt;/h2&gt;
+
+&lt;p&gt;In short, I learned it the hard way&lt;/p&gt;
+
+&lt;p&gt;I’m gonna start writing a serie of blogs explaining the whole process, by timeline order as follows&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Rethinking the Danbooru 2021 dataset&lt;/li&gt;
+  &lt;li&gt;A closer look into the latent-diffusion repo, do better than just looking&lt;/li&gt;
+  &lt;li&gt;The speed and quality trade-off for low computing scenarios&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;related-pose-keypoints-dataset-code-and-model-release&quot;&gt;Related pose keypoints dataset, code and model release&lt;/h2&gt;
+
+&lt;p&gt;Keypoints tar ball(more details in coming up posts):&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing&quot;&gt;https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Code of the latent-diffusion fork repo with keypoints conditioning (pretrained vq/ldm models included in repo README):&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/lxj616/latent-diffusion&quot;&gt;https://github.com/lxj616/latent-diffusion&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;citations&quot;&gt;Citations&lt;/h2&gt;
+
+&lt;p&gt;danbooru 2021 dataset originally contains 4.9m+ images, here I filtered out 363k subset, then further made a 101k tiny subset for further testing, https://www.gwern.net/Danbooru2021&lt;/p&gt;
+
+&lt;p&gt;latent diffusion models trained using &lt;a href=&quot;https://github.com/CompVis/latent-diffusion&quot;&gt;https://github.com/CompVis/latent-diffusion&lt;/a&gt; , modifications on keypoints conditioning&lt;/p&gt;
+
+&lt;p&gt;vq regularized models trained using &lt;a href=&quot;https://github.com/CompVis/taming-transformers&quot;&gt;https://github.com/CompVis/taming-transformers&lt;/a&gt; , no modifications&lt;/p&gt;
+
+&lt;p&gt;CLIP guided tuning using &lt;a href=&quot;https://twitter.com/RiversHaveWings/status/1516582795438567424&quot;&gt;https://twitter.com/RiversHaveWings/status/1516582795438567424&lt;/a&gt; , directly on vq regularized model latents, not reranking the composition stage&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{danbooru2021,
+    author = {Anonymous and Danbooru community and Gwern Branwen},
+    title = {Danbooru2021: A Large-Scale Crowdsourced and Tagged Anime Illustration Dataset},
+    howpublished = {\url{https://www.gwern.net/Danbooru2021}},
+    url = {https://www.gwern.net/Danbooru2021},
+    type = {dataset},
+    year = {2022},
+    month = {January},
+    timestamp = {2022-01-21},
+    note = {Accessed: DATE} }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{esser2020taming,
+      title={Taming Transformers for High-Resolution Image Synthesis}, 
+      author={Patrick Esser and Robin Rombach and Björn Ommer},
+      year={2020},
+      eprint={2012.09841},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{https://doi.org/10.48550/arxiv.2204.08583,
+  doi = {10.48550/ARXIV.2204.08583}, 
+  url = {https://arxiv.org/abs/2204.08583},
+  author = {Crowson, Katherine and Biderman, Stella and Kornis, Daniel and Stander, Dashiell and Hallahan, Eric and Castricato, Louis and Raff, Edward},
+  keywords = {Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {VQGAN-CLIP: Open Domain Image Generation and Editing with Natural Language Guidance},
+  publisher = {arXiv},
+  year = {2022},
+  copyright = {Creative Commons Attribution Share Alike 4.0 International}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Keypoint Based Anime Generation With Additional CLIP Guided Tuning</summary></entry><entry><title type="html">Reviving Leonid Afremov® Paintings</title><link href="http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings.html" rel="alternate" type="text/html" title="Reviving Leonid Afremov® Paintings" /><published>2021-09-26T21:56:52+08:00</published><updated>2021-09-26T21:56:52+08:00</updated><id>http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2021/09/26/reviving-leonid-afremov-paintings.html">&lt;h1 id=&quot;reviving-leonid-afremov-paintings&quot;&gt;Reviving Leonid Afremov® Paintings&lt;/h1&gt;
 
 &lt;p&gt;Leonid Afremov ®(born 12 July 1955 in Vitebsk, Belarus - Died August 19th 2019 , Playa Del Carmen, Quintana Roo, Mexico) is a Russian–Israeli modern impressionistic artist who works mainly with a palette knife and oils.&lt;/p&gt;
 

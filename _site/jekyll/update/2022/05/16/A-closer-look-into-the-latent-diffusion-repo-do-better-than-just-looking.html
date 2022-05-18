@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking | Something I found</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking" />
+<meta property="og:description" content="A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2022/05/16/A-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2022/05/16/A-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking.html" />
+<meta property="og:site_name" content="Something I found" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-16T14:16:02+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking","dateModified":"2022-05-16T14:16:02+08:00","datePublished":"2022-05-16T14:16:02+08:00","url":"http://localhost:4000/jekyll/update/2022/05/16/A-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2022/05/16/A-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking.html"},"description":"A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Something I found" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Something I found</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-05-16T14:16:02+08:00" itemprop="datePublished">May 16, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="a-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking">A Closer Look Into The latent-diffusion Repo, Do Better Than Just Looking</h1>
+
+<p>The two stage compress-then-diffusion boosts training efficiency dramatically, which made low computing art creations possible</p>
+
+<p>For those readers who aren’t familiar with <a href="https://github.com/CompVis/latent-diffusion">https://github.com/CompVis/latent-diffusion</a> , please see <a href="https://arxiv.org/abs/2112.10752">High-Resolution Image Synthesis with Latent Diffusion Models</a></p>
+
+<p>I would assume that you already tried or is going to try out this model-combo for your own artistic datasets</p>
+
+<p>The authors already released some pretrained vq/kl regularized autoencoder models, <strong>If your dataset looks like openimages dataset, or mathematically speaking your dataset have a similar visual feature distribution with the openimages dataset, then you’re in luck, just grab one pretrained autoencoder and train your ldm with demo configs</strong></p>
+
+<p>But what if your own dataset is visually very not similar from openimages, for example, danbooru anime dataset ?</p>
+
+<h2 id="the-pretrained-autoencoder-is-not-a-silver-bullet">The pretrained autoencoder is not a silver bullet</h2>
+
+<p>Let’s give the pretrained vq-f4 a reconstruction shot at danbooru images</p>
+
+<p><img src="/assets/151115.jpg" alt="151115" />
+<img src="/assets/151115_rec.jpg" alt="151115_rec" />
+<img src="/assets/80100.jpg" alt="80100" />
+<img src="/assets/80100_rec.jpg" alt="80100_rec" /></p>
+
+<p>Hmmm, the eyes are a little off, but it looks kinda fine</p>
+
+<p>Then the pretrained vq-f8:</p>
+
+<p><img src="/assets/151115.jpg" alt="151115" />
+<img src="/assets/151115_rec_f8.jpg" alt="151115_rec_f8" />
+<img src="/assets/80100.jpg" alt="80100" />
+<img src="/assets/80100_rec_f8.jpg" alt="80100_rec_f8" /></p>
+
+<p>Oh no, this is giving me nightmare</p>
+
+<p>So there is no need to test out the vq-f16, vq-f8 is compressing way too much</p>
+
+<p><strong>The question is: is the pretrained vq-f4 on openimages good enough for danbooru dataset ?</strong></p>
+
+<p><strong>Well, considering I already found that re-train a vq-f4 only takes one or two epochs, it’s really not necessery to endure with the eye detail gliches, as well as the biased codebook distribution</strong></p>
+
+<p>But even if the autoencoder training takes long, I still wouldn’t chose to use the pretrained vq-f4 on danbooru dataset, not only because the ‘best reconstruction’ is not good enough, the distribution of the codebook entries are very different than the danbooru dataset as well, it means that somewhere between a dress fiber texture code and hair strand texture code, there is a squirrel fur texture code should not be used, but will be optimized during later diffusion training, I have no idea what consequence it shall make but definitely not favoring it</p>
+
+<h2 id="selecting-a-proper-autoencoder-config">Selecting a proper autoencoder config</h2>
+
+<p>I have tried vq-f16/vq-f8/vq-f4 with the default config and the trainable parameter count are near identical due to gpu limit</p>
+
+<p><strong>Generally speaking, if you are creating 256x256 images, vq-f4 leads to a 64x64 diffusion model training, after my experiments, this is the best combo config that works really well</strong></p>
+
+<p>And after trying vq-f8, I found it hard to sustain the reconstrution quality without ramping up model abilities, with the same trainable parameters, it does’t do details well, another problem is if 64x64 diffusion model is training as fast as in 5 days on my case, spend more time on autoencoders in exchange for a easier diffusion training does not seem to be worth it</p>
+
+<p>I also tried vq-f16 on my first attempt, nah… , it’s working, but after two weeks time, it doesn’t seem to be more impressive, all the gloomy details drives me mad, compared with vq-f4 + 64x64 diffusion, it’s totally not worth it, unless you wanna try 1024x1024 high resolution image generation, which makes vq-f16 + 64x64 diffusion seems proper, but that shall be a different story then</p>
+
+<h2 id="conditioning-on-keypoints">Conditioning on keypoints</h2>
+
+<p><a href="https://github.com/CompVis/latent-diffusion">https://github.com/CompVis/latent-diffusion</a> already give examples about how to use cross attention to do conditional training, such as conditioning on image/class_label/object_center_point/depth_map etc, and I just made the 17 keypoints into a [1, 17] tensor, just as the object center point hack</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    def tokenize_coordinates(self, x: float, y: float, dim:int) -&gt; int:
+        """
+        Express 2d coordinates with one number.
+        Example: assume self.no_tokens = 16, then no_sections = 4:
+        0  0  0  0
+        0  0  #  0
+        0  0  0  0
+        0  0  0  x
+        Then the # position corresponds to token 6, the x position to token 15.
+        @param x: float in [0, 1]
+        @param y: float in [0, 1]
+        @return: discrete tokenized coordinate
+        """
+        #x_discrete = int(round(x * (self.512 - 1)))
+        #y_discrete = int(round(y * (self.512 - 1)))
+        if x &gt; (dim - 1):
+            x = (dim - 1)
+        if y &gt; (dim - 1):
+            y = (dim - 1)
+        if x &lt; 0:
+            x = 0
+        if y &lt; 0:
+            y = 0
+        return int(round(x)) + int(round(y) * dim)
+
+    def coordinates_from_token(self, token: int, dim: int) -&gt; (float, float):
+        x = token % dim
+        y = token // dim
+        return x, y
+
+    def build_tensor_from_kps(self, kps, dim):
+        kps_names = ['nose',
+                     'eye_left',
+                     'eye_right',
+                     'ear_left',
+                     'ear_right',
+                     'shoulder_left',
+                     'shoulder_right',
+                     'elbow_left',
+                     'elbow_right',
+                     'wrist_left',
+                     'wrist_right',
+                     'hip_left',
+                     'hip_right',
+                     'knee_left',
+                     'knee_right',
+                     'ankle_left',
+                     'ankle_right']
+        tokens = []
+        for name in kps_names:
+           x = kps[name][0]
+           y = kps[name][1]
+           if dim != 512:
+               x = x // (512/dim)
+               y = y // (512/dim)
+           _token = self.tokenize_coordinates(x, y, dim)
+           tokens.append(_token)
+        #return LongTensor(tokens)
+        return Tensor(tokens)
+</code></pre></div></div>
+
+<ol>
+  <li>A custom dataloader to load the json keypoints file</li>
+  <li>A DummyEncoder to construct the [1, 17] tensor from keypoints</li>
+  <li>Add keypoints option to the conditioning key for the model, modify log_images function to log conditioning keypoints as well</li>
+  <li>Adapt the config to use keypoints conditioning and enable spartial transformer cross attention options</li>
+</ol>
+
+<p>The complete code can be found at <a href="https://github.com/lxj616/latent-diffusion">https://github.com/lxj616/latent-diffusion</a></p>
+
+<h2 id="training-the-diffusion-model">Training the diffusion model</h2>
+
+<p>I decreased the model_channels to 160 (from 256) to save vram for larger batches, everything else is more or less copied from example config</p>
+
+<p>This config file can be found at configs/latent-diffusion/danbooru-keypoints-ldm-vq-4.yaml in my latent-diffusion fork repo</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>model:
+  base_learning_rate: 2.0e-06
+  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  params:
+    linear_start: 0.0015
+    cond_stage_key: keypoints
+    linear_end: 0.0195
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    first_stage_key: image
+    conditioning_key: crossattn
+    image_size: 64
+    channels: 3
+    monitor: val/loss_simple_ema
+    unet_config:
+      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        image_size: 64
+        in_channels: 3
+        out_channels: 3
+        model_channels: 160
+        attention_resolutions:
+        - 8
+        - 4
+        - 2
+        num_res_blocks: 2
+        channel_mult:
+        - 1
+        - 2
+        - 3
+        - 4
+        num_heads: 8
+        use_spatial_transformer: true
+        transformer_depth: 1
+        context_dim: 17
+        legacy: false
+    first_stage_config:
+      target: ldm.models.autoencoder.VQModelInterface
+      params:
+        embed_dim: 3
+        n_embed: 8192
+        ckpt_path: /workdir/taming-transformers/logs/2022-04-25T12-37-06_custom_vqgan/checkpoints/last.ckpt
+        ddconfig:
+          double_z: false
+          z_channels: 3
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          ch: 128
+          ch_mult:
+          - 1
+          - 2
+          - 4
+          num_res_blocks: 2
+          attn_resolutions: []
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+    cond_stage_config:
+      target: ldm.modules.encoders.modules.DummyEncoder
+      params:
+        key: keypoints
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 32
+    num_workers: 8
+    wrap: false
+    train:
+      target: ldm.data.custom_616.CustomTrain
+      params:
+        training_images_list_file: /workdir/datasets/danbooru_tiny.list
+        size: 256
+    validation:
+      target: ldm.data.custom_616.CustomTest
+      params:
+        test_images_list_file: /workdir/datasets/danbooru_tiny_test.list
+        size: 256
+
+</code></pre></div></div>
+
+<p>After 20 epochs of training, I suspect there is some overfitting, and keep observing until epoch 33, it became more and more obvious</p>
+
+<p><img src="/assets/progressive_row_gs-380000_e-000033_b-004988_cropped.jpg" alt="overfitting" /></p>
+
+<p>The model is trying to denoise some tiny details in the last steps, only to make the details worse, this is very dataset specific, too much noise in the danbooru dataset make details impossible to refine, as well as lack of data in total</p>
+
+<p><strong>So by calculation 20 epochs is good enough, which is 2022-04-30 ~ 2022-05-04 (5 days), the vq-f4 training took a day, so this is within a week on a single 3090 Ti</strong></p>
+
+<p>Maybe I should not have filtered the dataset too heavy losing too much slightly noisy data …</p>
+
+<h2 id="sample-using-pose-keypoints">Sample using pose keypoints</h2>
+
+<p>In short, parse the conditioning to ddim sampler, and you’ll get the conditioned output</p>
+
+<p>There is a demo script at scripts/sample_pose_diffusion.py in my latent-diffusion fork repo</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>samples, intermediates = ddim.sample(steps, conditioning=cond, batch_size=bs, shape=shape, eta=eta, verbose=False,)
+</code></pre></div></div>
+
+<p>And there are many hidden tricks that ddim already have, such as inpainting, priming on a different noise latent …</p>
+
+<p>When I tried to illustrate the final output quality, <strong>I chose a real world pose example from a short video</strong>, instead of using poses from the training/validation set, this is more fun and fair to demonstrate the model capabilities</p>
+
+<p>cherry-picked:</p>
+
+<p><img src="/assets/000068_1.jpg" alt="vq-f4 ddpm" /></p>
+
+<p>random sample:</p>
+
+<p><img src="/assets/total_grid.jpg" alt="random sample" /></p>
+
+<p>However if you really need to generate better quality images, you can also consider <strong>the “truncation trick”</strong> similar to stylegan/biggan, but in our case is to select <strong>“the most common top N poses”</strong></p>
+
+<p>Ha, gotcha, there is no common pose in the dataset, the keypoints are way too scattered to be in common, there are total 17 points everywhere, how could they possible accidentally be the same ? The ‘pose available space’ is 87112285931760246646623899502532662132736 large(I regularized the coordinate to be within 16x16 grids each, math.pow(256, 17)), good luck finding a most common pose to get the trick done</p>
+
+<p>The following pose is from the top row image in the training set, the generated output image is with similar pose but not identical with the training set image, there must be a similar image in the dataset though, if you don’t mind, selecting poses from the training set can give you better results, but not as fun as selecting real world poses to challenge the model, and to further improve the output quality by cheating, select a top common pose rather than random training set pose</p>
+
+<p><img src="/assets/ldm_example.jpg" alt="VQGAN f4 With latent diffusion" /></p>
+
+<h2 id="failure-attempts">Failure attempts</h2>
+
+<p>I tried to further clean up the danbooru dataset subset, reducing the noisy images and try vq-f8 to get details right and blazing fast, ended up worse output quality due to lack of data, details see my last post about datasets</p>
+
+<p>I tried to clean up anime image backgrounds, it wasn’t accurate enough, introduces new random image feature noises, not working</p>
+
+<p>I forgot to set spartial transformer in the config, find that out after many days when the log image can be clearly distinguished, my heart is broken, especially when I see the code comment after carefully debug</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        if use_spatial_transformer:
+            assert context_dim is not None, 'Fool!! You forgot to include the dimension of your cross-attention conditioning...'
+
+        if context_dim is not None:
+            assert use_spatial_transformer, 'Fool!! You forgot to use the spatial transformer for your cross-attention conditioning...'
+            from omegaconf.listconfig import ListConfig
+            if type(context_dim) == ListConfig:
+                context_dim = list(context_dim)
+</code></pre></div></div>
+
+<h2 id="citations">Citations</h2>
+
+<p>latent diffusion models trained using <a href="https://github.com/CompVis/latent-diffusion">https://github.com/CompVis/latent-diffusion</a> , modifications on keypoints conditioning</p>
+
+<p>vq regularized models trained using <a href="https://github.com/CompVis/taming-transformers">https://github.com/CompVis/taming-transformers</a> , no modifications</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+</code></pre></div></div>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{esser2020taming,
+      title={Taming Transformers for High-Resolution Image Synthesis}, 
+      author={Patrick Esser and Robin Rombach and Björn Ommer},
+      year={2020},
+      eprint={2012.09841},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/jekyll/update/2022/05/16/A-closer-look-into-the-latent-diffusion-repo-do-better-than-just-looking.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Something I found</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Something I found</li><li><a class="u-email" href="mailto:lxj616cn@gmail.com">lxj616cn@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lxj616</span></a></li><li><a href="https://www.twitter.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">lxj616</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>There is no description for this lxj616&#39;s blog, lazy dude, nah</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

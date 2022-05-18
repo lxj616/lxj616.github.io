@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Rethinking The Danbooru 2021 Dataset | Something I found</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Rethinking The Danbooru 2021 Dataset" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Rethinking The Danbooru 2021 Dataset" />
+<meta property="og:description" content="Rethinking The Danbooru 2021 Dataset" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2022/05/15/rethinking-the-danbooru-2021-dataset.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2022/05/15/rethinking-the-danbooru-2021-dataset.html" />
+<meta property="og:site_name" content="Something I found" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-05-15T01:11:18+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Rethinking The Danbooru 2021 Dataset" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Rethinking The Danbooru 2021 Dataset","dateModified":"2022-05-15T01:11:18+08:00","datePublished":"2022-05-15T01:11:18+08:00","url":"http://localhost:4000/jekyll/update/2022/05/15/rethinking-the-danbooru-2021-dataset.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2022/05/15/rethinking-the-danbooru-2021-dataset.html"},"description":"Rethinking The Danbooru 2021 Dataset","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Something I found" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Something I found</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Rethinking The Danbooru 2021 Dataset</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-05-15T01:11:18+08:00" itemprop="datePublished">May 15, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="rethinking-the-danbooru-2021-dataset">Rethinking The Danbooru 2021 Dataset</h1>
+
+<p>I trained a keypoint based anime generation model on top of the danbooru 2021 dataset, more specifically, on a filtered subset, and get some satisfying results</p>
+
+<p>But after everything is done, the whole process need to be reviewed, I need to do backpropagation towards my mind and do better next time</p>
+
+<p>So here comes the question: <strong>which problems are dataset related and how do they affect the later training process</strong></p>
+
+<h2 id="addressing-the-known-problems-discussed-in-years">Addressing the known problems discussed in years</h2>
+
+<ol>
+  <li>Hands have long been a weak point (https://www.gwern.net/Faces)</li>
+  <li>The danbooru dataset is way too noisy (reddit user comments)</li>
+</ol>
+
+<p>To train a pose keypoints based model, a pose keypoints dataset is required, but not all danbooru dataset images is suitable for training</p>
+
+<h2 id="my-approach-to-aquire-a-cleaner-subset">My approach to aquire a cleaner subset</h2>
+
+<p>Let’s take a look at https://www.gwern.net/Danbooru2021 offical grid sample image</p>
+
+<p><img src="/assets/danbooru2020-512px-samples.jpg" alt="danbooru2020-512px-samples.jpg" /></p>
+
+<p>Please be noted that this is from a SFW subset (around 3m+), and down-scaled to 512x512 already</p>
+
+<p>For the scenario of “keypoints based” anime generation, it’s easy to tell most of the samples are <strong>not suitable for training</strong>, naming a few:</p>
+
+<ol>
+  <li>book grid line sketch manga</li>
+  <li>multiple people</li>
+  <li>a girl making weird poses that the feet is too big and no arms</li>
+  <li>back facing the camera</li>
+  <li>a landscape photo</li>
+  <li>a calender cover</li>
+  <li>the girl is holding a doll face, and all backgroud full of doll face</li>
+</ol>
+
+<p>Among the 10x10=100 samples, <strong>basic counting tells that &lt; 20 samples meet the basic requirement</strong> “is a portrait with pose keypoints”</p>
+
+<p>So here we expect making a <strong>600k(20% of 3m)</strong> subset and they may still not be suitable for training</p>
+
+<p>Before I utilized CLIP text based filtering to clean the dataset, I found that 3m+ images is way too large for a deep learning model sweep (later I realized this is a misjudge)</p>
+
+<p>And after labeling every unwanted sample image CLIP score, I choose a threshold (with human examine sampling) of 600k to be the intermediate subset of the description “is a portrait with pose keypoints”</p>
+
+<p>Next I labeled all the 600k image samples with https://github.com/ShuhongChen/bizarre-pose-estimator , getting pose keypoints</p>
+
+<p>Now it’s time for some basic data analysis to cluster the poses</p>
+
+<p>As a example, here is plotting the “middle of the two hip keypoint” with dbscan clustering</p>
+
+<p><img src="/assets/Figure_1.png" alt="Figure_1.png" /></p>
+
+<p>Turns out the dbscan clustering is totally unnecesary, just simply plot it and the answer is obvious</p>
+
+<ol>
+  <li>sometimes hip is out of the image scope, such as half portrait may only have top upper body, so y &gt;= 512 is totally understandable</li>
+  <li>when something went wrong with the image or pose-estimation model, random points are understandable, such as some weird four legged creature may have hip anywhere</li>
+  <li>the dense area of the main distribution seems to be normal, regarding one single ‘hip position’ alone, are they good samples for training ?</li>
+</ol>
+
+<p>Wait, I have a fun quiz about the fore-mentioned figure:</p>
+
+<p>Under what circumstances should a anime <strong>have hips top of the image like y &lt; 100</strong> ?</p>
+
+<p>Ans:</p>
+
+<details>
+  <summary>Show the case</summary>
+  <p> 
+  <img src="/assets/2106.jpg" />
+  </p>
+</details>
+
+<p>XD</p>
+
+<p>Finally, applying several data analysis techniques, <strong>I finally got a 363k subset</strong> which is ~50% smaller than the previous intermediate 600k subset, make sure every shoulder and wrist etc etc not placing too odd</p>
+
+<p><strong>Maybe this filtering is a little bit overhead, sometimes I felt like this type of filtering does not eliminate most abnormal samples but hurt total available image count directly</strong></p>
+
+<h2 id="rethink-a-cleaner-subset-is-not-clean-enough">Rethink: A cleaner subset is not clean enough</h2>
+
+<p>Here’s 20 random samples from the 363k subset</p>
+
+<p><img src="/assets/20_concat.jpg" alt="20_concat.jpg" /></p>
+
+<ol>
+  <li>top row 8/20 (40%) images seems to be near-unified portraits <strong>suitable for training</strong></li>
+  <li>mid row 6/20 (30%) images seems to be <strong>questionable</strong>, not sure if the model could refine details from such stylized complex-visual image</li>
+  <li>bottom row 6/20 (30%) images is totally <strong>unacceptable</strong>, it shall make the training unstable and semantically confused</li>
+</ol>
+
+<p>Now to recap the problems we mention earlier</p>
+
+<h3 id="hands-have-long-been-a-weak-point">Hands have long been a weak point</h3>
+
+<p>If your dataset only ~40% contains standard looking hands, and ~60% images the hand is holding some item or does not have hands at all, your model are not going to generate hands well</p>
+
+<p>By intuition the next step is to further clean up the dataset, selecting only the appropriate 40% (top row as example), make it 140k in total and finally getting better results</p>
+
+<p>Well, I tried, making a 101k subset out of the 364k subset, but I can not get it ‘selecting only the appropriate 40%’, by statistics they look alike, the best way I can come up with is to train another resnet model to label them, but this dataset is different from the leonid afremov dataset, I can hand craft segmentation 25% of the 600 paintings, but there is no way I tag sufficient percentage of this 363k dataset all by myself</p>
+
+<p>I finally made a 101k subset towards ‘the most usual poses’ by statistics, and it does not do well, too less data regarding too much poses</p>
+
+<h3 id="the-danbooru-dataset-is-way-too-noisy">The danbooru dataset is way too noisy</h3>
+
+<p>Even with all the efforts to clean the dataset, in the final sampling stage, it is easy to spot totally undesirable outputs such as below</p>
+
+<p><img src="/assets/bad_sample_000032.jpg" alt="bad_sample_000032.jpg" /></p>
+
+<p>There must be a cool white hair knight wearing leather armor so cool so dark in the dataset, and totally not like any of the anime cute girls wearing dresses</p>
+
+<p>However, the pose is correct, at least, a cool white hair leather armor knight is still anime, I guess</p>
+
+<p>In a different perspective, it also could meant that there isn’t enough similar images in the dataset, a dozen more leather armor knight images should allow the model to draw better</p>
+
+<p>A more promising approach to deal with noisy dataset is to ramp up the model ability like TADNE “model size increase (more than doubles, to 1GB total)”, aydao did a good job on other hacks as well, but in my situation I chose to try the opposite, to make training time as low as 4~9 days with one single gpu thus can not afford to double the model size, at all, and as a consequence, I filtered out 90% of the dataset images instead of training on the full/intermediate dataset</p>
+
+<h2 id="unfinished-exploration">Unfinished exploration</h2>
+
+<p>If I were to do it again, with the lessions learnt in a hard way, I would carefully carry it out in the following order:</p>
+
+<ol>
+  <li>CLIP filtering at the very first place, towards full 3m+ dataset, don’t do image feature clustering (didn’t mention in this article), just CLIP out the majority unwanted images, leave the rest for later procedures</li>
+  <li>assume the first stage already filtered out more than half of the images, tag the rest with pose estimator https://github.com/ShuhongChen/bizarre-pose-estimator, filter them soft and gentle, don’t go too far</li>
+  <li>if manual sampling from the subset observes obvious type of bad case, a lot, and assume CLIP doesn’t help in this particular case, do some coding to deal with it, example: too much black borders with too little content</li>
+  <li>manually tag 1% of the dataset, train a reset model, testing 5% of the dataset, correct the prediction and re-train with 5% of the dataset, then testing 25% of the dataset, correct the prediction again then re-train on 25% of the dataset, get the whole dataset filtered (I tried this method to generate a 70k dataset on other experiments, it works really well, but time consuming), I guess this step could take weeks for a dataset as large as danbooru even pre-filtered into intermediate subset</li>
+</ol>
+
+<p>As for the “image feature clustering”, I already regret doing so, it does not rule out the “white hair knight wearing leather armor” case, It does not deal with “too large black border too little content” case, and easy to spot weird images can be filtered either by CLIP or pose-estimator, the bottleneck is not the GPU speed, I found the reason of my slow inferencing speed is due to the USB hard drive I store the 3m+ images on, BTW, I lost all data on that drive later, one should never use USB hard drive to store massive amount of images</p>
+
+<p>I assume that if everything went well, there would be a near 150k pose keypoint image subset, around 70k best quality images and 80k sort-of-complex images, and no white hair knight wearing leather armor !</p>
+
+<p>Or if you got more computing power to spare, filter the dataset more gently, allow a slightly noisier but overall much larger dataset may improve training, my attempt training with a 101k subset(compared to 363k) ends up damaging overall generation quality</p>
+
+<p>But that will be other warriors’ adventure, I’ll upload the 363k keypoints if anyone is interested, the filename is the image id, you could download the corresponding image from danbooru 2021 https://www.gwern.net/Danbooru2021, follow the webpage instructions and you can only download images with corresponding id in the shard, or download the whole SFW subset then fetch the image locally if wish not to read long instructions</p>
+
+<p>The json file for each image contains 17 keypoints just like coco dataset, and is the output of https://github.com/ShuhongChen/bizarre-pose-estimator, you can generate your own image keypoints using this repo, one example below</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{"nose": [176.8, 256.0], "eye_left": [150.4, 282.40000000000003], "eye_right": [168.0, 247.20000000000002], "ear_left": [150.4, 322.00000000000006], "ear_right": [181.20000000000002, 234.0], "shoulder_left": [238.4, 374.80000000000007], "shoulder_right": [264.8, 251.60000000000002], "elbow_left": [348.40000000000003, 361.6000000000001], "elbow_right": [361.6000000000001, 251.60000000000002], "wrist_left": [445.20000000000005, 427.6000000000001], "wrist_right": [388.00000000000006, 225.20000000000002], "hip_left": [533.2, 401.20000000000005], "hip_right": [414.40000000000003, 286.80000000000007], "knee_left": [352.80000000000007, 220.8], "knee_right": [405.6000000000001, 150.4], "ankle_left": [396.80000000000007, 128.4], "ankle_right": [392.40000000000003, 128.4]}
+</code></pre></div></div>
+
+<p>To visualize, use the same way visualizing coco dataset, a example can be found in my forked latent-diffusion condition logging functions, which borrows from bizarre-pose-estimator code repo and is originally from coco dataset utilities</p>
+
+<p><img src="/assets/conditioning_gs-160000_e-000014_b-000904.jpg" alt="conditioning keypoints log" /></p>
+
+<p>Keypoints tar ball:</p>
+
+<p><a href="https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing">https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing</a></p>
+
+<h2 id="citations">Citations</h2>
+
+<p>danbooru 2021 dataset originally contains 4.9m+ images, here I filtered out 363k subset, then further made a 101k tiny subset for further testing, https://www.gwern.net/Danbooru2021</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{danbooru2021,
+    author = {Anonymous and Danbooru community and Gwern Branwen},
+    title = {Danbooru2021: A Large-Scale Crowdsourced and Tagged Anime Illustration Dataset},
+    howpublished = {\url{https://www.gwern.net/Danbooru2021}},
+    url = {https://www.gwern.net/Danbooru2021},
+    type = {dataset},
+    year = {2022},
+    month = {January},
+    timestamp = {2022-01-21},
+    note = {Accessed: DATE} }
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{https://doi.org/10.48550/arxiv.2108.01819,
+  doi = {10.48550/ARXIV.2108.01819},
+  url = {https://arxiv.org/abs/2108.01819},
+  author = {Chen, Shuhong and Zwicker, Matthias},
+  keywords = {Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and information sciences, FOS: Computer and information sciences},
+  title = {Transfer Learning for Pose Estimation of Illustrated Characters},
+  publisher = {arXiv},
+  year = {2021},
+  copyright = {Creative Commons Attribution 4.0 International}
+}
+
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/jekyll/update/2022/05/15/rethinking-the-danbooru-2021-dataset.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Something I found</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Something I found</li><li><a class="u-email" href="mailto:lxj616cn@gmail.com">lxj616cn@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lxj616</span></a></li><li><a href="https://www.twitter.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">lxj616</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>There is no description for this lxj616&#39;s blog, lazy dude, nah</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
