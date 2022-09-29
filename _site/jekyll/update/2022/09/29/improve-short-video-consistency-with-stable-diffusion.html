@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Improve short video consistency with stable diffusion | Something I found</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Improve short video consistency with stable diffusion" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Improve Short Video Consistency With Stable Diffusion" />
+<meta property="og:description" content="Improve Short Video Consistency With Stable Diffusion" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html" />
+<meta property="og:site_name" content="Something I found" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-09-29T19:04:25+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Improve short video consistency with stable diffusion" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Improve short video consistency with stable diffusion","dateModified":"2022-09-29T19:04:25+08:00","datePublished":"2022-09-29T19:04:25+08:00","url":"http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html"},"description":"Improve Short Video Consistency With Stable Diffusion","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Something I found" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Something I found</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Improve short video consistency with stable diffusion</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-09-29T19:04:25+08:00" itemprop="datePublished">Sep 29, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="improve-short-video-consistency-with-stable-diffusion">Improve Short Video Consistency With Stable Diffusion</h1>
+
+<p>Stable diffusion has a built-in example for img2img generation and thus we could easily adopt it for vid2vid, however, it does not seem to be good enough keeping the video frames consistent and smooth</p>
+
+<p><img src="/assets/video_consistency.gif" alt="video_consistency.gif" /></p>
+
+<p>In case you have doubts, I already used fixed noise and fixed seed(s) for all frames, now we can focus on the obvious problems</p>
+
+<p>The gif above is resized and compressed for better webpage loading, not the original length and quality</p>
+
+<ol>
+  <li>One problem is that if we select a ‘noising strength’ too low as right-top-corner (–strength 0.45), the model seems doing trival edits which does not do anything but for adding jumping artifacts across frames</li>
+  <li>Another problem is that if we select a higher ‘noising strength’ as left-bottom-corner (–strength 0.75), the model ignores the obvious object across frames and makes the car disappear, and I still feel it not artistic enough</li>
+</ol>
+
+<p>Here I adopt a idea from paper <a href="https://arxiv.org/abs/2201.11632">Deep Video Prior for Video Consistency and Propagation</a>, and make it like right-bottom-corner achieving better video consistency for short videos</p>
+
+<h2 id="not-the-old-content-style-balance-problem">Not the old content style balance problem</h2>
+
+<p>If you remember the old neural style stuff, you could recall something named content style balance, there is a magic ratio to be tuned manually so as to find better trade-off on content fidelity against style</p>
+
+<p>Here we have a parameter ‘noising strength’, you put a 0.01 and got near exact the original content, and you put a 0.99 for total imagination with prompt, could there be a satisfying value in the middle ?</p>
+
+<p>Well, I couldn’t find one, and even with my hack done, the video is still kind of jumpy, the improvement is limited</p>
+
+<p><strong>You have to increase content fidelity by using a lower noising strength for video frames consistency, but how are you going to make notable text prompt edits on such low noising strength ?</strong></p>
+
+<p>Now we got a problem to solve</p>
+
+<h2 id="short-video-as-the-unconditional-dataset">Short video as the unconditional dataset</h2>
+
+<p>We hope the stable diffusion model to generate video frames according to the reference video, at some degree, we do not wish to generate something far from all frames</p>
+
+<p>So we could finetune the stable diffusion model to reconstruct better video frames if not given any text prompts, then use text prompts to edit them</p>
+
+<p>A fun fact is that after many experiments, I found 30 frames is good enough to deal with a 300 frames short video, not really need to finetune on them all, unless your video got sudden subject twists</p>
+
+<h2 id="text-to-image-as-the-conditional-dataset">Text to image as the conditional dataset</h2>
+
+<p>Select a frame as a example, do txt2img until you are satisfied, with a rather large noising strength, don’t worry about the content may inconsistent with the original frame yet, we have more steps further down</p>
+
+<ol>
+  <li>It is okay that the edited frame has obviously changed too much in color space, for example black shirts to red dress, you may use (–strength 0.75) and even more</li>
+  <li>It is NOT okay if the subject changed composition too much, for example human arm position may change a lot, generate more images to select the nearest one, or decrease the noising strength, frames are going jumpy otherwise</li>
+  <li>Remember the text prompt</li>
+</ol>
+
+<h2 id="finetune-on-combined-dataset">Finetune on combined dataset</h2>
+
+<p>Now, we got a unconditional dataset which consists 30 frames, with empty text embedding, a conditional dataset consists maybe 2 different text prompts on 1 frame</p>
+
+<p>So we have a dataset of 32 frames in total</p>
+
+<p>Let’s resume training on stable diffusion as finetuning, if you have not read my previous post about how to finetune the model, it is time to go for it now</p>
+
+<p>I have also employed some techniques I discovered earlier, including only finetune on late steps to speed up training</p>
+
+<p>And make sure text conditional dataset start denoising from its paired original frame as starting point</p>
+
+<p>Due to the small amount of frames (32 in this case), the whole process is within hours, for one single video, but the output quality still needs to be improved</p>
+
+<h2 id="further-details">Further details</h2>
+
+<p>The original video is from youtube ‘https://www.youtube.com/channel/UCBcVQr-07MH-p9e2kRTdB3A’, author J Utah, cropped 10 seconds (from 1.5 hour) and to 512x512</p>
+
+<p>The text prompt is “a abstract painting of a cyberpunk city night, tron robotic, trending on artstation”</p>
+
+<p>Strength parameter for clockwise: original, 0.45, 0.45, 0.75 (after finetuning, you can lower the strength parameter to get more fidelity, I use 0.45 for comparison, for human 0.325 is good enough)</p>
+
+<p>Finetuned for 1000 iters (for human only need around 400 iters), 1e-5 lr, late steps 500</p>
+
+<p>Generation using 50 steps (lazy, nah)</p>
+
+<p>Using blender for linux to combine the image to videos</p>
+
+<h2 id="citations">Citations</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@inproceedings{lei2020dvp,
+  title={Blind Video Temporal Consistency via Deep Video Prior},
+  author={Lei, Chenyang and Xing, Yazhou and Chen, Qifeng},
+  booktitle={Advances in Neural Information Processing Systems},
+  year={2020}
+}    
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@article{DVP_lei,
+  author    = {Chenyang Lei and
+               Yazhou Xing and
+               Hao Ouyang and
+               Qifeng Chen},
+  title     = {Deep Video Prior for Video Consistency and Propagation},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  year      = {To Appear}
+}
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Something I found</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Something I found</li><li><a class="u-email" href="mailto:lxj616cn@gmail.com">lxj616cn@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lxj616</span></a></li><li><a href="https://www.twitter.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">lxj616</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>There is no description for this lxj616&#39;s blog, lazy dude, nah</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

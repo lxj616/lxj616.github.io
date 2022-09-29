@@ -1,4 +1,108 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-09-12T15:10:50+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Finetune stable diffusion under 24gb vram in hours</title><link href="http://localhost:4000/jekyll/update/2022/09/12/finetune-stable-diffusion-under-24gb-vram-in-hours.html" rel="alternate" type="text/html" title="Finetune stable diffusion under 24gb vram in hours" /><published>2022-09-12T13:15:31+08:00</published><updated>2022-09-12T13:15:31+08:00</updated><id>http://localhost:4000/jekyll/update/2022/09/12/finetune-stable-diffusion-under-24gb-vram-in-hours</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/09/12/finetune-stable-diffusion-under-24gb-vram-in-hours.html">&lt;h1 id=&quot;finetune-stable-diffusion-under-24gb-vram-in-hours&quot;&gt;Finetune Stable Diffusion Under 24GB VRAM In Hours&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-09-29T20:25:46+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Improve short video consistency with stable diffusion</title><link href="http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html" rel="alternate" type="text/html" title="Improve short video consistency with stable diffusion" /><published>2022-09-29T19:04:25+08:00</published><updated>2022-09-29T19:04:25+08:00</updated><id>http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html">&lt;h1 id=&quot;improve-short-video-consistency-with-stable-diffusion&quot;&gt;Improve Short Video Consistency With Stable Diffusion&lt;/h1&gt;
+
+&lt;p&gt;Stable diffusion has a built-in example for img2img generation and thus we could easily adopt it for vid2vid, however, it does not seem to be good enough keeping the video frames consistent and smooth&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/video_consistency.gif&quot; alt=&quot;video_consistency.gif&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In case you have doubts, I already used fixed noise and fixed seed(s) for all frames, now we can focus on the obvious problems&lt;/p&gt;
+
+&lt;p&gt;The gif above is resized and compressed for better webpage loading, not the original length and quality&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;One problem is that if we select a ‘noising strength’ too low as right-top-corner (–strength 0.45), the model seems doing trival edits which does not do anything but for adding jumping artifacts across frames&lt;/li&gt;
+  &lt;li&gt;Another problem is that if we select a higher ‘noising strength’ as left-bottom-corner (–strength 0.75), the model ignores the obvious object across frames and makes the car disappear, and I still feel it not artistic enough&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Here I adopt a idea from paper &lt;a href=&quot;https://arxiv.org/abs/2201.11632&quot;&gt;Deep Video Prior for Video Consistency and Propagation&lt;/a&gt;, and make it like right-bottom-corner achieving better video consistency for short videos&lt;/p&gt;
+
+&lt;h2 id=&quot;not-the-old-content-style-balance-problem&quot;&gt;Not the old content style balance problem&lt;/h2&gt;
+
+&lt;p&gt;If you remember the old neural style stuff, you could recall something named content style balance, there is a magic ratio to be tuned manually so as to find better trade-off on content fidelity against style&lt;/p&gt;
+
+&lt;p&gt;Here we have a parameter ‘noising strength’, you put a 0.01 and got near exact the original content, and you put a 0.99 for total imagination with prompt, could there be a satisfying value in the middle ?&lt;/p&gt;
+
+&lt;p&gt;Well, I couldn’t find one, and even with my hack done, the video is still kind of jumpy, the improvement is limited&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;You have to increase content fidelity by using a lower noising strength for video frames consistency, but how are you going to make notable text prompt edits on such low noising strength ?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Now we got a problem to solve&lt;/p&gt;
+
+&lt;h2 id=&quot;short-video-as-the-unconditional-dataset&quot;&gt;Short video as the unconditional dataset&lt;/h2&gt;
+
+&lt;p&gt;We hope the stable diffusion model to generate video frames according to the reference video, at some degree, we do not wish to generate something far from all frames&lt;/p&gt;
+
+&lt;p&gt;So we could finetune the stable diffusion model to reconstruct better video frames if not given any text prompts, then use text prompts to edit them&lt;/p&gt;
+
+&lt;p&gt;A fun fact is that after many experiments, I found 30 frames is good enough to deal with a 300 frames short video, not really need to finetune on them all, unless your video got sudden subject twists&lt;/p&gt;
+
+&lt;h2 id=&quot;text-to-image-as-the-conditional-dataset&quot;&gt;Text to image as the conditional dataset&lt;/h2&gt;
+
+&lt;p&gt;Select a frame as a example, do txt2img until you are satisfied, with a rather large noising strength, don’t worry about the content may inconsistent with the original frame yet, we have more steps further down&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;It is okay that the edited frame has obviously changed too much in color space, for example black shirts to red dress, you may use (–strength 0.75) and even more&lt;/li&gt;
+  &lt;li&gt;It is NOT okay if the subject changed composition too much, for example human arm position may change a lot, generate more images to select the nearest one, or decrease the noising strength, frames are going jumpy otherwise&lt;/li&gt;
+  &lt;li&gt;Remember the text prompt&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;finetune-on-combined-dataset&quot;&gt;Finetune on combined dataset&lt;/h2&gt;
+
+&lt;p&gt;Now, we got a unconditional dataset which consists 30 frames, with empty text embedding, a conditional dataset consists maybe 2 different text prompts on 1 frame&lt;/p&gt;
+
+&lt;p&gt;So we have a dataset of 32 frames in total&lt;/p&gt;
+
+&lt;p&gt;Let’s resume training on stable diffusion as finetuning, if you have not read my previous post about how to finetune the model, it is time to go for it now&lt;/p&gt;
+
+&lt;p&gt;I have also employed some techniques I discovered earlier, including only finetune on late steps to speed up training&lt;/p&gt;
+
+&lt;p&gt;And make sure text conditional dataset start denoising from its paired original frame as starting point&lt;/p&gt;
+
+&lt;p&gt;Due to the small amount of frames (32 in this case), the whole process is within hours, for one single video, but the output quality still needs to be improved&lt;/p&gt;
+
+&lt;h2 id=&quot;further-details&quot;&gt;Further details&lt;/h2&gt;
+
+&lt;p&gt;The original video is from youtube ‘https://www.youtube.com/channel/UCBcVQr-07MH-p9e2kRTdB3A’, author J Utah, cropped 10 seconds (from 1.5 hour) and to 512x512&lt;/p&gt;
+
+&lt;p&gt;The text prompt is “a abstract painting of a cyberpunk city night, tron robotic, trending on artstation”&lt;/p&gt;
+
+&lt;p&gt;Strength parameter for clockwise: original, 0.45, 0.45, 0.75 (after finetuning, you can lower the strength parameter to get more fidelity, I use 0.45 for comparison, for human 0.325 is good enough)&lt;/p&gt;
+
+&lt;p&gt;Finetuned for 1000 iters (for human only need around 400 iters), 1e-5 lr, late steps 500&lt;/p&gt;
+
+&lt;p&gt;Generation using 50 steps (lazy, nah)&lt;/p&gt;
+
+&lt;p&gt;Using blender for linux to combine the image to videos&lt;/p&gt;
+
+&lt;h2 id=&quot;citations&quot;&gt;Citations&lt;/h2&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@inproceedings{lei2020dvp,
+  title={Blind Video Temporal Consistency via Deep Video Prior},
+  author={Lei, Chenyang and Xing, Yazhou and Chen, Qifeng},
+  booktitle={Advances in Neural Information Processing Systems},
+  year={2020}
+}    
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@article{DVP_lei,
+  author    = {Chenyang Lei and
+               Yazhou Xing and
+               Hao Ouyang and
+               Qifeng Chen},
+  title     = {Deep Video Prior for Video Consistency and Propagation},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  year      = {To Appear}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Improve Short Video Consistency With Stable Diffusion</summary></entry><entry><title type="html">Finetune stable diffusion under 24gb vram in hours</title><link href="http://localhost:4000/jekyll/update/2022/09/12/finetune-stable-diffusion-under-24gb-vram-in-hours.html" rel="alternate" type="text/html" title="Finetune stable diffusion under 24gb vram in hours" /><published>2022-09-12T13:15:31+08:00</published><updated>2022-09-12T13:15:31+08:00</updated><id>http://localhost:4000/jekyll/update/2022/09/12/finetune-stable-diffusion-under-24gb-vram-in-hours</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/09/12/finetune-stable-diffusion-under-24gb-vram-in-hours.html">&lt;h1 id=&quot;finetune-stable-diffusion-under-24gb-vram-in-hours&quot;&gt;Finetune Stable Diffusion Under 24GB VRAM In Hours&lt;/h1&gt;
 
 &lt;p&gt;Compared to textual inversion stable diffusion (which needs 10GB+), resume training the original model itself needs more resources, but I have managed to do it using one single RTX 3090Ti, in hours&lt;/p&gt;
 
@@ -24,7 +128,7 @@
 
 &lt;p&gt;However, let’s respect my mom’s privacy and use Tom and Jerry screenshots as a example instead&lt;/p&gt;
 
-&lt;h2 id=&quot;pre-encode-the-clip-and-f8-embedding-to-free-more-vrams&quot;&gt;pre-encode the CLIP and f8 embedding to free more vrams&lt;/h2&gt;
+&lt;h2 id=&quot;pre-encode-the-clip-and-f8-embedding-to-free-more-vrams&quot;&gt;Pre-encode the CLIP and f8 embedding to free more vrams&lt;/h2&gt;
 
 &lt;p&gt;The original training/inference config encode text/image pair on the fly, which loads CLIP model into vram, we can not afford it&lt;/p&gt;
 
