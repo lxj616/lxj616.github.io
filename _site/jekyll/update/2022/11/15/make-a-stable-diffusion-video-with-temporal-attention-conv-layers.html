@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Make a stable diffusion video with temporal attention conv layers | Something I found</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Make a stable diffusion video with temporal attention conv layers" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Make A Stable Diffusion Video With Temporal Attention &amp; Conv Layers" />
+<meta property="og:description" content="Make A Stable Diffusion Video With Temporal Attention &amp; Conv Layers" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html" />
+<meta property="og:site_name" content="Something I found" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-11-15T13:23:01+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Make a stable diffusion video with temporal attention conv layers" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Make a stable diffusion video with temporal attention conv layers","dateModified":"2022-11-15T13:23:01+08:00","datePublished":"2022-11-15T13:23:01+08:00","url":"http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html"},"description":"Make A Stable Diffusion Video With Temporal Attention &amp; Conv Layers","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Something I found" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Something I found</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Make a stable diffusion video with temporal attention conv layers</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-11-15T13:23:01+08:00" itemprop="datePublished">Nov 15, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="make-a-stable-diffusion-video-with-temporal-attention--conv-layers">Make A Stable Diffusion Video With Temporal Attention &amp; Conv Layers</h1>
+
+<p>Long story short, I put <a href="https://github.com/lucidrains/make-a-video-pytorch">https://github.com/lucidrains/make-a-video-pytorch</a> into <a href="https://github.com/CompVis/stable-diffusion/">https://github.com/CompVis/stable-diffusion/</a></p>
+
+<p><img src="/assets/make-a-stable-diffusion-video.jpg" alt="make-a-stable-diffusion-video.jpg" /></p>
+
+<p>The prompts are (top to bottom):</p>
+
+<ol>
+  <li>cyberpunk imaginary scenic byway road drive, trending on artstation</li>
+  <li>volcano fire burning scenic byway road drive, trending on artstation</li>
+  <li>summer dawn scenic byway road drive, award winning photography</li>
+</ol>
+
+<p>Trained with a 4 hour driving video</p>
+
+<p><a href="https://www.youtube.com/watch?v=ZOZOqbK86t0">4K Scenic Byway 12 All American Road in Utah, USA - 5 Hour of Road Drive with Relaxing Music</a></p>
+
+<p>split into frames using a low framerate (-r 10)</p>
+
+<p>The video is random selected and from <a href="https://www.youtube.com/c/RelaxationChannel">RelaxationChannel</a> , and crop center 512x512</p>
+
+<h2 id="a-video-in-theory-is-not-a-video-with-real-reasonable-quality">A video in theory is not a video with real reasonable quality</h2>
+
+<p>If you take a deeper look, it’s not hard to spot these image sequence are all “driving video” with poor consistency across time, to name a few:</p>
+
+<ol>
+  <li>The road is changing fast across time because we are driving, good, the far background isn’t moving as fast because they are far away, cool, but how the hell the plants are not moving backwards as we drive ?</li>
+  <li>A video needs at least several seconds maybe, how come 5 images be called a video ?</li>
+  <li>A model that only generate “driving video” is not a text to video model, it’s more like a text based style filter for very specific reference video, could it generalize as text to video with current proof ?</li>
+</ol>
+
+<h2 id="computational-impossible-for-home-computers">Computational impossible for home computers</h2>
+
+<p>The original stable-diffusion Unet model has around <strong>859.52 M parameters</strong>, and is said to use 4000 gpus a month for v1.4 let alone further versions</p>
+
+<p>When extending the original stable diffusion model with temporal attention/conv layers, <strong>it reached 1100 M params</strong>, and is dealing with multi-frame image data compared to original single image processing</p>
+
+<p>And <strong>I got one single 24G vram RTX 3090Ti</strong>, even if it could somehow fit in the vram, there’s definitely no way getting another 3999 gpus, or experimenting a whole month</p>
+
+<p>Thus I am writting a blog with poor results knowing it is not nearly done training, it can not be done with my current computing capability</p>
+
+<h2 id="insert-11b-model-elephant-into-24g-vram-refrigerator-and-go-training">Insert 1.1B model elephant into 24G vram refrigerator and go training</h2>
+
+<p>I’ll just list the hacks I am using, we would not discuss so many papers/hacks all day</p>
+
+<ol>
+  <li><a href="https://github.com/HazyResearch/flash-attention">flash-attention</a> with f16, and memory efficient normal attention</li>
+  <li>Remove first-stage-model and cond-stage-model, pre-compute the embeddings (see my previous post)</li>
+  <li>Let’s call 5 frames a video, especially when I can not afford more frames</li>
+  <li>Freeze the original attention layers, and not conditioning on text in temporal attention</li>
+</ol>
+
+<p>And some other hacks does not seem to work, list below:</p>
+
+<ol>
+  <li>8bit Adam seems to spare 40MB more vram, quite trival for my case, maybe I am not deploying right ?</li>
+  <li>I can not cut down model channels because stable diffusion backbone requires exact 320 channels</li>
+  <li>Try image first and video later so as to freeze the conv layers, but it does not work, I’ll try it again later</li>
+</ol>
+
+<p>Finally make it going with a batch size of 2 each gpu node, and I got one gpu, so that’s batch 2 every step, for 4 days</p>
+
+<p>stable diffusion used batch 2048 and 1400k steps, I got batch 2 and 657k steps, and I’m dealing with a much bigger 1.1B param model, and video !</p>
+
+<p><img src="/assets/loss_make_a_stable_diffusion_video.png" alt="loss_make_a_stable_diffusion_video.png" /></p>
+
+<p>After 4 days of training, the loss is still observable decreasing and actually generation models does not stop on loss converge, not to mention it’s far from converge</p>
+
+<p>But I can wait no more, at this rate <strong>I’ll need to wait around 4 x (2048 x 1400k)/(2 x 657k) / 365 ~= 20 years</strong>, lets stop here at where it is</p>
+
+<h2 id="plants-not-moving-backwards-as-we-drive">Plants not moving backwards as we drive</h2>
+
+<p>At first I suspect my freezing layers disrupt the learning process, maybe train a latent video diffusion could have made the plants looks like going backwards when driving ?</p>
+
+<p>I combined <a href="https://github.com/lucidrains/video-diffusion-pytorch">https://github.com/lucidrains/video-diffusion-pytorch</a> with stable diffusion f8 first stage model, and trained from scratch</p>
+
+<p>But only to notice the same problem, the road is moving, the sky and clouds are minimum shifting a little, the trees however are changing shape like horror movies</p>
+
+<p>I’m out of ideas, so be it</p>
+
+<h2 id="more-frames-at-inference-time">More frames at inference time</h2>
+
+<p>Yes, I can generate 6 frames when training at 5</p>
+
+<p>But I have doubts if training only 5 frames could leverage the temporal attention capabilities well, that is too many parameters for too short sequence</p>
+
+<p>And Make-A-Video implements a frame interpolation mechanism, and multi framerate training, I could not do that, neither adding more layers nor conditioning on framerate is 24G vram friendly, if I decrease the batchsize to 1, I may need 40 years to do experiment on it</p>
+
+<p>I’m out of gpus, so be it</p>
+
+<h2 id="text-to-driving-video-evaluation">Text to driving video evaluation</h2>
+
+<ol>
+  <li>It can utilize the original stable diffusion attention, and discover volcano/cyberpunk/dawn styles and object like volcanos, manipulation with text</li>
+  <li>It’s trying to generate consistent frames across time, and deal with roads/sideway buildings/far-horizon-objects differently, however it does very very bad due to low compute, and low compute is not the only reason, object come in closer is something hard for the model to understand</li>
+  <li>I used to thought maybe utilizing the stable diffusion model and adding temporal layers could be easy piece, but now the 1.1B model isn’t vram friendly at all, this is so hard</li>
+</ol>
+
+<h2 id="keep-going-and-careful-plan-sharing-unverified-code">Keep going and careful plan sharing unverified code</h2>
+
+<p>It would be nice if I make a totally working make-a-stable-diffusion-video open source repository and sharing with others, but now the fact is that I can not conclude this is working correctly and I can not finish training</p>
+
+<p>I’d be cautious and try testing it with limited computing resources, however others may release more powerful research or pretrained network structure models soon, it would be much better if I can finetune on something instead of doing from scratch myself</p>
+
+<p>Not until I make something really convincing, I would not do a fraud repo containing unverified code, the “volcano fire burning scenic byway road drive” may seem to be working, but it’s not science nor art this way, yet</p>
+
+<p>Keep going, to infinity and beyond</p>
+
+<h2 id="citations">Citations</h2>
+
+<p>Thanks to the opensource repos made by <a href="https://github.com/lucidrains">https://github.com/lucidrains</a> , including but not limited to:</p>
+
+<p>https://github.com/lucidrains/make-a-video-pytorch</p>
+
+<p>https://github.com/lucidrains/video-diffusion-pytorch</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{Singer2022,
+    author  = {Uriel Singer},
+    url     = {https://makeavideo.studio/Make-A-Video.pdf}
+}
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{ho2022video,
+  title   = {Video Diffusion Models}, 
+  author  = {Jonathan Ho and Tim Salimans and Alexey Gritsenko and William Chan and Mohammad Norouzi and David J. Fleet},
+  year    = {2022},
+  eprint  = {2204.03458},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CV}
+}
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Something I found</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Something I found</li><li><a class="u-email" href="mailto:lxj616cn@gmail.com">lxj616cn@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lxj616</span></a></li><li><a href="https://www.twitter.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">lxj616</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>There is no description for this lxj616&#39;s blog, lazy dude, nah</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

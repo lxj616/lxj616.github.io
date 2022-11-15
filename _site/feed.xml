@@ -1,4 +1,145 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-09-29T20:25:46+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Improve short video consistency with stable diffusion</title><link href="http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html" rel="alternate" type="text/html" title="Improve short video consistency with stable diffusion" /><published>2022-09-29T19:04:25+08:00</published><updated>2022-09-29T19:04:25+08:00</updated><id>http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html">&lt;h1 id=&quot;improve-short-video-consistency-with-stable-diffusion&quot;&gt;Improve Short Video Consistency With Stable Diffusion&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-11-15T13:58:11+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Make a stable diffusion video with temporal attention conv layers</title><link href="http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html" rel="alternate" type="text/html" title="Make a stable diffusion video with temporal attention conv layers" /><published>2022-11-15T13:23:01+08:00</published><updated>2022-11-15T13:23:01+08:00</updated><id>http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html">&lt;h1 id=&quot;make-a-stable-diffusion-video-with-temporal-attention--conv-layers&quot;&gt;Make A Stable Diffusion Video With Temporal Attention &amp;amp; Conv Layers&lt;/h1&gt;
+
+&lt;p&gt;Long story short, I put &lt;a href=&quot;https://github.com/lucidrains/make-a-video-pytorch&quot;&gt;https://github.com/lucidrains/make-a-video-pytorch&lt;/a&gt; into &lt;a href=&quot;https://github.com/CompVis/stable-diffusion/&quot;&gt;https://github.com/CompVis/stable-diffusion/&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/make-a-stable-diffusion-video.jpg&quot; alt=&quot;make-a-stable-diffusion-video.jpg&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The prompts are (top to bottom):&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;cyberpunk imaginary scenic byway road drive, trending on artstation&lt;/li&gt;
+  &lt;li&gt;volcano fire burning scenic byway road drive, trending on artstation&lt;/li&gt;
+  &lt;li&gt;summer dawn scenic byway road drive, award winning photography&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Trained with a 4 hour driving video&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=ZOZOqbK86t0&quot;&gt;4K Scenic Byway 12 All American Road in Utah, USA - 5 Hour of Road Drive with Relaxing Music&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;split into frames using a low framerate (-r 10)&lt;/p&gt;
+
+&lt;p&gt;The video is random selected and from &lt;a href=&quot;https://www.youtube.com/c/RelaxationChannel&quot;&gt;RelaxationChannel&lt;/a&gt; , and crop center 512x512&lt;/p&gt;
+
+&lt;h2 id=&quot;a-video-in-theory-is-not-a-video-with-real-reasonable-quality&quot;&gt;A video in theory is not a video with real reasonable quality&lt;/h2&gt;
+
+&lt;p&gt;If you take a deeper look, it’s not hard to spot these image sequence are all “driving video” with poor consistency across time, to name a few:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;The road is changing fast across time because we are driving, good, the far background isn’t moving as fast because they are far away, cool, but how the hell the plants are not moving backwards as we drive ?&lt;/li&gt;
+  &lt;li&gt;A video needs at least several seconds maybe, how come 5 images be called a video ?&lt;/li&gt;
+  &lt;li&gt;A model that only generate “driving video” is not a text to video model, it’s more like a text based style filter for very specific reference video, could it generalize as text to video with current proof ?&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;computational-impossible-for-home-computers&quot;&gt;Computational impossible for home computers&lt;/h2&gt;
+
+&lt;p&gt;The original stable-diffusion Unet model has around &lt;strong&gt;859.52 M parameters&lt;/strong&gt;, and is said to use 4000 gpus a month for v1.4 let alone further versions&lt;/p&gt;
+
+&lt;p&gt;When extending the original stable diffusion model with temporal attention/conv layers, &lt;strong&gt;it reached 1100 M params&lt;/strong&gt;, and is dealing with multi-frame image data compared to original single image processing&lt;/p&gt;
+
+&lt;p&gt;And &lt;strong&gt;I got one single 24G vram RTX 3090Ti&lt;/strong&gt;, even if it could somehow fit in the vram, there’s definitely no way getting another 3999 gpus, or experimenting a whole month&lt;/p&gt;
+
+&lt;p&gt;Thus I am writting a blog with poor results knowing it is not nearly done training, it can not be done with my current computing capability&lt;/p&gt;
+
+&lt;h2 id=&quot;insert-11b-model-elephant-into-24g-vram-refrigerator-and-go-training&quot;&gt;Insert 1.1B model elephant into 24G vram refrigerator and go training&lt;/h2&gt;
+
+&lt;p&gt;I’ll just list the hacks I am using, we would not discuss so many papers/hacks all day&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/HazyResearch/flash-attention&quot;&gt;flash-attention&lt;/a&gt; with f16, and memory efficient normal attention&lt;/li&gt;
+  &lt;li&gt;Remove first-stage-model and cond-stage-model, pre-compute the embeddings (see my previous post)&lt;/li&gt;
+  &lt;li&gt;Let’s call 5 frames a video, especially when I can not afford more frames&lt;/li&gt;
+  &lt;li&gt;Freeze the original attention layers, and not conditioning on text in temporal attention&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;And some other hacks does not seem to work, list below:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;8bit Adam seems to spare 40MB more vram, quite trival for my case, maybe I am not deploying right ?&lt;/li&gt;
+  &lt;li&gt;I can not cut down model channels because stable diffusion backbone requires exact 320 channels&lt;/li&gt;
+  &lt;li&gt;Try image first and video later so as to freeze the conv layers, but it does not work, I’ll try it again later&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Finally make it going with a batch size of 2 each gpu node, and I got one gpu, so that’s batch 2 every step, for 4 days&lt;/p&gt;
+
+&lt;p&gt;stable diffusion used batch 2048 and 1400k steps, I got batch 2 and 657k steps, and I’m dealing with a much bigger 1.1B param model, and video !&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/loss_make_a_stable_diffusion_video.png&quot; alt=&quot;loss_make_a_stable_diffusion_video.png&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After 4 days of training, the loss is still observable decreasing and actually generation models does not stop on loss converge, not to mention it’s far from converge&lt;/p&gt;
+
+&lt;p&gt;But I can wait no more, at this rate &lt;strong&gt;I’ll need to wait around 4 x (2048 x 1400k)/(2 x 657k) / 365 ~= 20 years&lt;/strong&gt;, lets stop here at where it is&lt;/p&gt;
+
+&lt;h2 id=&quot;plants-not-moving-backwards-as-we-drive&quot;&gt;Plants not moving backwards as we drive&lt;/h2&gt;
+
+&lt;p&gt;At first I suspect my freezing layers disrupt the learning process, maybe train a latent video diffusion could have made the plants looks like going backwards when driving ?&lt;/p&gt;
+
+&lt;p&gt;I combined &lt;a href=&quot;https://github.com/lucidrains/video-diffusion-pytorch&quot;&gt;https://github.com/lucidrains/video-diffusion-pytorch&lt;/a&gt; with stable diffusion f8 first stage model, and trained from scratch&lt;/p&gt;
+
+&lt;p&gt;But only to notice the same problem, the road is moving, the sky and clouds are minimum shifting a little, the trees however are changing shape like horror movies&lt;/p&gt;
+
+&lt;p&gt;I’m out of ideas, so be it&lt;/p&gt;
+
+&lt;h2 id=&quot;more-frames-at-inference-time&quot;&gt;More frames at inference time&lt;/h2&gt;
+
+&lt;p&gt;Yes, I can generate 6 frames when training at 5&lt;/p&gt;
+
+&lt;p&gt;But I have doubts if training only 5 frames could leverage the temporal attention capabilities well, that is too many parameters for too short sequence&lt;/p&gt;
+
+&lt;p&gt;And Make-A-Video implements a frame interpolation mechanism, and multi framerate training, I could not do that, neither adding more layers nor conditioning on framerate is 24G vram friendly, if I decrease the batchsize to 1, I may need 40 years to do experiment on it&lt;/p&gt;
+
+&lt;p&gt;I’m out of gpus, so be it&lt;/p&gt;
+
+&lt;h2 id=&quot;text-to-driving-video-evaluation&quot;&gt;Text to driving video evaluation&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;It can utilize the original stable diffusion attention, and discover volcano/cyberpunk/dawn styles and object like volcanos, manipulation with text&lt;/li&gt;
+  &lt;li&gt;It’s trying to generate consistent frames across time, and deal with roads/sideway buildings/far-horizon-objects differently, however it does very very bad due to low compute, and low compute is not the only reason, object come in closer is something hard for the model to understand&lt;/li&gt;
+  &lt;li&gt;I used to thought maybe utilizing the stable diffusion model and adding temporal layers could be easy piece, but now the 1.1B model isn’t vram friendly at all, this is so hard&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;keep-going-and-careful-plan-sharing-unverified-code&quot;&gt;Keep going and careful plan sharing unverified code&lt;/h2&gt;
+
+&lt;p&gt;It would be nice if I make a totally working make-a-stable-diffusion-video open source repository and sharing with others, but now the fact is that I can not conclude this is working correctly and I can not finish training&lt;/p&gt;
+
+&lt;p&gt;I’d be cautious and try testing it with limited computing resources, however others may release more powerful research or pretrained network structure models soon, it would be much better if I can finetune on something instead of doing from scratch myself&lt;/p&gt;
+
+&lt;p&gt;Not until I make something really convincing, I would not do a fraud repo containing unverified code, the “volcano fire burning scenic byway road drive” may seem to be working, but it’s not science nor art this way, yet&lt;/p&gt;
+
+&lt;p&gt;Keep going, to infinity and beyond&lt;/p&gt;
+
+&lt;h2 id=&quot;citations&quot;&gt;Citations&lt;/h2&gt;
+
+&lt;p&gt;Thanks to the opensource repos made by &lt;a href=&quot;https://github.com/lucidrains&quot;&gt;https://github.com/lucidrains&lt;/a&gt; , including but not limited to:&lt;/p&gt;
+
+&lt;p&gt;https://github.com/lucidrains/make-a-video-pytorch&lt;/p&gt;
+
+&lt;p&gt;https://github.com/lucidrains/video-diffusion-pytorch&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{Singer2022,
+    author  = {Uriel Singer},
+    url     = {https://makeavideo.studio/Make-A-Video.pdf}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{ho2022video,
+  title   = {Video Diffusion Models}, 
+  author  = {Jonathan Ho and Tim Salimans and Alexey Gritsenko and William Chan and Mohammad Norouzi and David J. Fleet},
+  year    = {2022},
+  eprint  = {2204.03458},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Make A Stable Diffusion Video With Temporal Attention &amp;amp; Conv Layers</summary></entry><entry><title type="html">Improve short video consistency with stable diffusion</title><link href="http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html" rel="alternate" type="text/html" title="Improve short video consistency with stable diffusion" /><published>2022-09-29T19:04:25+08:00</published><updated>2022-09-29T19:04:25+08:00</updated><id>http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/09/29/improve-short-video-consistency-with-stable-diffusion.html">&lt;h1 id=&quot;improve-short-video-consistency-with-stable-diffusion&quot;&gt;Improve Short Video Consistency With Stable Diffusion&lt;/h1&gt;
 
 &lt;p&gt;Stable diffusion has a built-in example for img2img generation and thus we could easily adopt it for vid2vid, however, it does not seem to be good enough keeping the video frames consistent and smooth&lt;/p&gt;
 
