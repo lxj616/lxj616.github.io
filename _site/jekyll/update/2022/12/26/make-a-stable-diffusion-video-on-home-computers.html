@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Make a stable diffusion video on home computers | Something I found</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Make a stable diffusion video on home computers" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Make A Stable Diffusion Video On Home Computers" />
+<meta property="og:description" content="Make A Stable Diffusion Video On Home Computers" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2022/12/26/make-a-stable-diffusion-video-on-home-computers.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2022/12/26/make-a-stable-diffusion-video-on-home-computers.html" />
+<meta property="og:site_name" content="Something I found" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-12-26T13:14:58+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Make a stable diffusion video on home computers" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Make a stable diffusion video on home computers","dateModified":"2022-12-26T13:14:58+08:00","datePublished":"2022-12-26T13:14:58+08:00","url":"http://localhost:4000/jekyll/update/2022/12/26/make-a-stable-diffusion-video-on-home-computers.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2022/12/26/make-a-stable-diffusion-video-on-home-computers.html"},"description":"Make A Stable Diffusion Video On Home Computers","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Something I found" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Something I found</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Make a stable diffusion video on home computers</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2022-12-26T13:14:58+08:00" itemprop="datePublished">Dec 26, 2022
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="make-a-stable-diffusion-video-on-home-computers">Make A Stable Diffusion Video On Home Computers</h1>
+
+<p><img src="/assets/gif_cat_small.gif" alt="gif_cat_small.gif" /></p>
+
+<p>The gif is manually resized to 256x256 and crop only 12 frames for better blog network loading speed, originally trained at 512x512 and 25 frames (can generate as much as 120 frames when inference)</p>
+
+<h2 id="now-share-the-working-code">Now share the working code</h2>
+
+<p>In my last post about adding pseudo-3d structure to stable-diffusion model, I did not share the code simply because I can not prove it working due to lack of compute, and I already explained that in my last post</p>
+
+<p>Now I get it working and I trained a toy model with my single RTX 3090Ti, making the theory into real practice, and now it is time for sharing the code</p>
+
+<p><a href="https://github.com/lxj616/make-a-stable-diffusion-video">https://github.com/lxj616/make-a-stable-diffusion-video</a></p>
+
+<p>And a pretrained toy model is at <a href="https://huggingface.co/lxj616/make-a-stable-diffusion-video-timelapse">huggingface</a></p>
+
+<h2 id="further-improve-the-vram-consumption--training-speed">Further improve the vram consumption &amp; training speed</h2>
+
+<ol>
+  <li>Finally I gave up using the full precision stable diffusion backbone, in my last post I tried to do mix precision training and enable fp16 only on new layers, now I regret that</li>
+  <li>Use <a href="https://github.com/huggingface/accelerate">https://github.com/huggingface/accelerate</a> to offload optimizer states to cpu could spare more vram</li>
+  <li>Freeze the backbone and filter the parameters for optimization, proved successful despite the make-a-video paper suggests training altogether (maybe for better generation quality? I can not afford that)</li>
+  <li>Because of switching to diffusers repository and met some problems with (xformers + RTX 3090ti), used custom build flash attention as alternative, it’s faster compared to not enable xformers</li>
+  <li>Did a partial gradient checkpointing trick to make training a little faster when vram has spared some space with half precision</li>
+</ol>
+
+<p>Turns out I made a huge mistake in my last post, I thought fp16 is to be used on new layers with mixed precision training like all tutorials suggests, but afterwards I realized to save more vram actually is done mainly by reduce the backbone precision, thanks to the diffuers repository, I instantly realized a half accurate model is better than totally unusable</p>
+
+<h2 id="a-much-smaller-dataset-for-quick-testing-and-toy-training">A much smaller dataset for quick testing and toy training</h2>
+
+<p>Another huge mistake I made in my last post is to build a 3970 size driving video dataset, which took forever to train on a single RTX 3090Ti, it’s still too large for testing</p>
+
+<p>I was so confused why the plants are not moving backward as we drive, the reason is simple: not enough training and not enough frames length</p>
+
+<p>The timelapse video dataset contains only 286 videos, so that I can easily get 60 epochs in hours, with a much better optimized(sort of overfit) training output</p>
+
+<p><img src="/assets/loss_video_diffusers.jpg" alt="loss_video_diffusers.jpg" /></p>
+
+<p>If you remember, the loss from my last post is higher than 0.105 and now is down to 0.08, not to mention the increased frames length give more stability</p>
+
+<p>This timelapse dataset is mainly come from <a href="http://www.setvak.cz/setvak-cz.html">Martin Setvak</a> and others, trained using frames_length=25 and fp16 (some experiment using bfloat16, I may not remember accurately, definitely not full precision for sure)</p>
+
+<p>If you need this dataset, you can download from Martin Setvak website yourself because I am not allowed to redistribute, and the original author can choose to cancel sharing whenever he likes</p>
+
+<p>Due to some frozen seconds at the beginning of the video, I crop the video using following script, as well as crop to 512x512 and reduce framerate to 5</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>#!/bin/bash
+for i in `ls matin_setvak_video/`
+do
+    mkdir -p matin_setvak_frames/$i
+    duration=`ffprobe -v error -show_entries format=duration -of csv=p=0 "matin_setvak_video/$i"`
+    cut_duration=`python -c "print($duration - 4.0)"`
+    ffmpeg -i "matin_setvak_video/$i" -ss 00:00:02.00 -t $cut_duration -r 5 -y -an -q 0 -vf scale="'if(gt(iw,ih),-1,512):if(gt(iw,ih),512,-1)', crop=512:512:exact=1" matin_setvak_frames/$i/%06d.jpg
+    rm matin_setvak_frames/$i/000001.jpg
+done
+</code></pre></div></div>
+
+<h2 id="does-it-work-good-enough">Does it work good enough</h2>
+
+<p>Well, much better than last time, but I got to admit that 286 video is disastrously small and of very little use for video generation</p>
+
+<p>All the toy model do is to generate moving clouds and timelapse lighting progressing acoss the landscape, it literally only does timelapse</p>
+
+<p>The model was never trained on cats and so the cat does not move at all, and clouds is the only thing it can generate, LOL</p>
+
+<p>But I believe it works, at least the clouds are moving and the cat is not, and the cat is getting shifting lighting across time just like landscape, yay ~</p>
+
+<p>With the code actually do something, there is no telling if I accidentaly did something wrong, there still be open possibilities, I don’t give any warrant on the sharing code, okay</p>
+
+<h2 id="further-plan">Further plan</h2>
+
+<p>If not any new models come out proving to be more efficient or better looking, I could try getting larger dataset training with limited computing resources, but for my current compute capacity, I would not dream of trying anything larger than 3000 videos</p>
+
+<p>So my best bet is something like stable diffusion for video go opensource and finetune on that</p>
+
+<h2 id="citations">Citations</h2>
+
+<p>Thanks to the opensource repos made by <a href="https://github.com/lucidrains">https://github.com/lucidrains</a> , including but not limited to:</p>
+
+<p>https://github.com/lucidrains/make-a-video-pytorch</p>
+
+<p>https://github.com/lucidrains/video-diffusion-pytorch</p>
+
+<p>And my code is based on <a href="https://github.com/huggingface/diffusers">https://github.com/huggingface/diffusers</a>, especially most of the speed up tricks are bundled within the original repository</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{Singer2022,
+    author  = {Uriel Singer},
+    url     = {https://makeavideo.studio/Make-A-Video.pdf}
+}
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{ho2022video,
+  title   = {Video Diffusion Models}, 
+  author  = {Jonathan Ho and Tim Salimans and Alexey Gritsenko and William Chan and Mohammad Norouzi and David J. Fleet},
+  year    = {2022},
+  eprint  = {2204.03458},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CV}
+}
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{von-platen-etal-2022-diffusers,
+  author = {Patrick von Platen and Suraj Patil and Anton Lozhkov and Pedro Cuenca and Nathan Lambert and Kashif Rasul and Mishig Davaadorj and Thomas Wolf},
+  title = {Diffusers: State-of-the-art diffusion models},
+  year = {2022},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/huggingface/diffusers}}
+}
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/jekyll/update/2022/12/26/make-a-stable-diffusion-video-on-home-computers.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Something I found</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Something I found</li><li><a class="u-email" href="mailto:lxj616cn@gmail.com">lxj616cn@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lxj616</span></a></li><li><a href="https://www.twitter.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">lxj616</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>There is no description for this lxj616&#39;s blog, lazy dude, nah</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

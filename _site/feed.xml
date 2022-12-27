@@ -1,4 +1,123 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-11-15T13:58:11+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Make a stable diffusion video with temporal attention conv layers</title><link href="http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html" rel="alternate" type="text/html" title="Make a stable diffusion video with temporal attention conv layers" /><published>2022-11-15T13:23:01+08:00</published><updated>2022-11-15T13:23:01+08:00</updated><id>http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html">&lt;h1 id=&quot;make-a-stable-diffusion-video-with-temporal-attention--conv-layers&quot;&gt;Make A Stable Diffusion Video With Temporal Attention &amp;amp; Conv Layers&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2022-12-27T16:38:04+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Make a stable diffusion video on home computers</title><link href="http://localhost:4000/jekyll/update/2022/12/26/make-a-stable-diffusion-video-on-home-computers.html" rel="alternate" type="text/html" title="Make a stable diffusion video on home computers" /><published>2022-12-26T13:14:58+08:00</published><updated>2022-12-26T13:14:58+08:00</updated><id>http://localhost:4000/jekyll/update/2022/12/26/make-a-stable-diffusion-video-on-home-computers</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/12/26/make-a-stable-diffusion-video-on-home-computers.html">&lt;h1 id=&quot;make-a-stable-diffusion-video-on-home-computers&quot;&gt;Make A Stable Diffusion Video On Home Computers&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/gif_cat_small.gif&quot; alt=&quot;gif_cat_small.gif&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The gif is manually resized to 256x256 and crop only 12 frames for better blog network loading speed, originally trained at 512x512 and 25 frames (can generate as much as 120 frames when inference)&lt;/p&gt;
+
+&lt;h2 id=&quot;now-share-the-working-code&quot;&gt;Now share the working code&lt;/h2&gt;
+
+&lt;p&gt;In my last post about adding pseudo-3d structure to stable-diffusion model, I did not share the code simply because I can not prove it working due to lack of compute, and I already explained that in my last post&lt;/p&gt;
+
+&lt;p&gt;Now I get it working and I trained a toy model with my single RTX 3090Ti, making the theory into real practice, and now it is time for sharing the code&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/lxj616/make-a-stable-diffusion-video&quot;&gt;https://github.com/lxj616/make-a-stable-diffusion-video&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;And a pretrained toy model is at &lt;a href=&quot;https://huggingface.co/lxj616/make-a-stable-diffusion-video-timelapse&quot;&gt;huggingface&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;further-improve-the-vram-consumption--training-speed&quot;&gt;Further improve the vram consumption &amp;amp; training speed&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Finally I gave up using the full precision stable diffusion backbone, in my last post I tried to do mix precision training and enable fp16 only on new layers, now I regret that&lt;/li&gt;
+  &lt;li&gt;Use &lt;a href=&quot;https://github.com/huggingface/accelerate&quot;&gt;https://github.com/huggingface/accelerate&lt;/a&gt; to offload optimizer states to cpu could spare more vram&lt;/li&gt;
+  &lt;li&gt;Freeze the backbone and filter the parameters for optimization, proved successful despite the make-a-video paper suggests training altogether (maybe for better generation quality? I can not afford that)&lt;/li&gt;
+  &lt;li&gt;Because of switching to diffusers repository and met some problems with (xformers + RTX 3090ti), used custom build flash attention as alternative, it’s faster compared to not enable xformers&lt;/li&gt;
+  &lt;li&gt;Did a partial gradient checkpointing trick to make training a little faster when vram has spared some space with half precision&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Turns out I made a huge mistake in my last post, I thought fp16 is to be used on new layers with mixed precision training like all tutorials suggests, but afterwards I realized to save more vram actually is done mainly by reduce the backbone precision, thanks to the diffuers repository, I instantly realized a half accurate model is better than totally unusable&lt;/p&gt;
+
+&lt;h2 id=&quot;a-much-smaller-dataset-for-quick-testing-and-toy-training&quot;&gt;A much smaller dataset for quick testing and toy training&lt;/h2&gt;
+
+&lt;p&gt;Another huge mistake I made in my last post is to build a 3970 size driving video dataset, which took forever to train on a single RTX 3090Ti, it’s still too large for testing&lt;/p&gt;
+
+&lt;p&gt;I was so confused why the plants are not moving backward as we drive, the reason is simple: not enough training and not enough frames length&lt;/p&gt;
+
+&lt;p&gt;The timelapse video dataset contains only 286 videos, so that I can easily get 60 epochs in hours, with a much better optimized(sort of overfit) training output&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/loss_video_diffusers.jpg&quot; alt=&quot;loss_video_diffusers.jpg&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you remember, the loss from my last post is higher than 0.105 and now is down to 0.08, not to mention the increased frames length give more stability&lt;/p&gt;
+
+&lt;p&gt;This timelapse dataset is mainly come from &lt;a href=&quot;http://www.setvak.cz/setvak-cz.html&quot;&gt;Martin Setvak&lt;/a&gt; and others, trained using frames_length=25 and fp16 (some experiment using bfloat16, I may not remember accurately, definitely not full precision for sure)&lt;/p&gt;
+
+&lt;p&gt;If you need this dataset, you can download from Martin Setvak website yourself because I am not allowed to redistribute, and the original author can choose to cancel sharing whenever he likes&lt;/p&gt;
+
+&lt;p&gt;Due to some frozen seconds at the beginning of the video, I crop the video using following script, as well as crop to 512x512 and reduce framerate to 5&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#!/bin/bash
+for i in `ls matin_setvak_video/`
+do
+    mkdir -p matin_setvak_frames/$i
+    duration=`ffprobe -v error -show_entries format=duration -of csv=p=0 &quot;matin_setvak_video/$i&quot;`
+    cut_duration=`python -c &quot;print($duration - 4.0)&quot;`
+    ffmpeg -i &quot;matin_setvak_video/$i&quot; -ss 00:00:02.00 -t $cut_duration -r 5 -y -an -q 0 -vf scale=&quot;'if(gt(iw,ih),-1,512):if(gt(iw,ih),512,-1)', crop=512:512:exact=1&quot; matin_setvak_frames/$i/%06d.jpg
+    rm matin_setvak_frames/$i/000001.jpg
+done
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;does-it-work-good-enough&quot;&gt;Does it work good enough&lt;/h2&gt;
+
+&lt;p&gt;Well, much better than last time, but I got to admit that 286 video is disastrously small and of very little use for video generation&lt;/p&gt;
+
+&lt;p&gt;All the toy model do is to generate moving clouds and timelapse lighting progressing acoss the landscape, it literally only does timelapse&lt;/p&gt;
+
+&lt;p&gt;The model was never trained on cats and so the cat does not move at all, and clouds is the only thing it can generate, LOL&lt;/p&gt;
+
+&lt;p&gt;But I believe it works, at least the clouds are moving and the cat is not, and the cat is getting shifting lighting across time just like landscape, yay ~&lt;/p&gt;
+
+&lt;p&gt;With the code actually do something, there is no telling if I accidentaly did something wrong, there still be open possibilities, I don’t give any warrant on the sharing code, okay&lt;/p&gt;
+
+&lt;h2 id=&quot;further-plan&quot;&gt;Further plan&lt;/h2&gt;
+
+&lt;p&gt;If not any new models come out proving to be more efficient or better looking, I could try getting larger dataset training with limited computing resources, but for my current compute capacity, I would not dream of trying anything larger than 3000 videos&lt;/p&gt;
+
+&lt;p&gt;So my best bet is something like stable diffusion for video go opensource and finetune on that&lt;/p&gt;
+
+&lt;h2 id=&quot;citations&quot;&gt;Citations&lt;/h2&gt;
+
+&lt;p&gt;Thanks to the opensource repos made by &lt;a href=&quot;https://github.com/lucidrains&quot;&gt;https://github.com/lucidrains&lt;/a&gt; , including but not limited to:&lt;/p&gt;
+
+&lt;p&gt;https://github.com/lucidrains/make-a-video-pytorch&lt;/p&gt;
+
+&lt;p&gt;https://github.com/lucidrains/video-diffusion-pytorch&lt;/p&gt;
+
+&lt;p&gt;And my code is based on &lt;a href=&quot;https://github.com/huggingface/diffusers&quot;&gt;https://github.com/huggingface/diffusers&lt;/a&gt;, especially most of the speed up tricks are bundled within the original repository&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{Singer2022,
+    author  = {Uriel Singer},
+    url     = {https://makeavideo.studio/Make-A-Video.pdf}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{ho2022video,
+  title   = {Video Diffusion Models}, 
+  author  = {Jonathan Ho and Tim Salimans and Alexey Gritsenko and William Chan and Mohammad Norouzi and David J. Fleet},
+  year    = {2022},
+  eprint  = {2204.03458},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{rombach2021highresolution,
+      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
+      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
+      year={2021},
+      eprint={2112.10752},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{von-platen-etal-2022-diffusers,
+  author = {Patrick von Platen and Suraj Patil and Anton Lozhkov and Pedro Cuenca and Nathan Lambert and Kashif Rasul and Mishig Davaadorj and Thomas Wolf},
+  title = {Diffusers: State-of-the-art diffusion models},
+  year = {2022},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/huggingface/diffusers}}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Make A Stable Diffusion Video On Home Computers</summary></entry><entry><title type="html">Make a stable diffusion video with temporal attention conv layers</title><link href="http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html" rel="alternate" type="text/html" title="Make a stable diffusion video with temporal attention conv layers" /><published>2022-11-15T13:23:01+08:00</published><updated>2022-11-15T13:23:01+08:00</updated><id>http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/11/15/make-a-stable-diffusion-video-with-temporal-attention-conv-layers.html">&lt;h1 id=&quot;make-a-stable-diffusion-video-with-temporal-attention--conv-layers&quot;&gt;Make A Stable Diffusion Video With Temporal Attention &amp;amp; Conv Layers&lt;/h1&gt;
 
 &lt;p&gt;Long story short, I put &lt;a href=&quot;https://github.com/lucidrains/make-a-video-pytorch&quot;&gt;https://github.com/lucidrains/make-a-video-pytorch&lt;/a&gt; into &lt;a href=&quot;https://github.com/CompVis/stable-diffusion/&quot;&gt;https://github.com/CompVis/stable-diffusion/&lt;/a&gt;&lt;/p&gt;
 
