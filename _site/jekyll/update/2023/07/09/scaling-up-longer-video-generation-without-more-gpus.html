@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Scaling up longer video generation model training without more gpus | Something I found</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Scaling up longer video generation model training without more gpus" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Scaling Up Longer Video Generation Model Training Without More GPUs" />
+<meta property="og:description" content="Scaling Up Longer Video Generation Model Training Without More GPUs" />
+<link rel="canonical" href="http://localhost:4000/jekyll/update/2023/07/09/scaling-up-longer-video-generation-without-more-gpus.html" />
+<meta property="og:url" content="http://localhost:4000/jekyll/update/2023/07/09/scaling-up-longer-video-generation-without-more-gpus.html" />
+<meta property="og:site_name" content="Something I found" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-07-09T21:46:14+08:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Scaling up longer video generation model training without more gpus" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Scaling up longer video generation model training without more gpus","dateModified":"2023-07-09T21:46:14+08:00","datePublished":"2023-07-09T21:46:14+08:00","url":"http://localhost:4000/jekyll/update/2023/07/09/scaling-up-longer-video-generation-without-more-gpus.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/jekyll/update/2023/07/09/scaling-up-longer-video-generation-without-more-gpus.html"},"description":"Scaling Up Longer Video Generation Model Training Without More GPUs","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Something I found" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Something I found</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Scaling up longer video generation model training without more gpus</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-07-09T21:46:14+08:00" itemprop="datePublished">Jul 9, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h1 id="scaling-up-longer-video-generation-model-training-without-more-gpus">Scaling Up Longer Video Generation Model Training Without More GPUs</h1>
+
+<p><img src="/assets/darth_vader_final.gif" alt="darth_vader_final.gif" />
+<img src="/assets/harley_final.gif" alt="harley_final.gif" /></p>
+
+<p>The gif is manually resized to 256x256 and heavy lossy compressed using <code class="language-plaintext highlighter-rouge">gifsicle -O3 --lossy=200 --resize 256x256</code> for better blog network loading speed, originally trained at 512x512 and generates more than 181 frames</p>
+
+<p>However these gifs are more than 1MB each, so if you have trouble loading the gif, you may need to go and download from github blog repo yourself, I can’t compress the gifs any further</p>
+
+<p><strong>The dataset and model heavy resemble real life human with personal identity such as faces and bodys, thus can not go opensource for legal concerns</strong></p>
+
+<h2 id="tldr">TL;DR</h2>
+
+<p>I used my RTX 3090Ti and created a 24370 clips dataset and trained a model under 24GB vram limitation that is capable of generating hundreds of frames with some consistency to the first frame, but during this experiment I changed every possible thing mid-training so there is no solid proof of what I learnt except for it more or less works this way</p>
+
+<h2 id="scaling-up-the-dataset">Scaling up the dataset</h2>
+
+<p>Last time I hand crafted a walking on stage video dataset containing 2848 clips, and I trained on each first 65 frames</p>
+
+<p>Which is bigger than the far previous 286 timelapse video dataset, but still too small for some real challenge</p>
+
+<p>So I gathered a human dancing dataset from various internet sources, containing 24370 video clips and has 181 frames each</p>
+
+<p>It is the most difficult subject for image generation and video generation: human and rapid motion</p>
+
+<ol>
+  <li>The clips are aligned using pose detection, and resized to 512x512</li>
+  <li>Each clip contains at maximum 2 alternative augmentation, so there are more than 24370 actual clips when training</li>
+  <li>Contains some “bad” clips which contains heavy camera motion, or the human ran out of screen</li>
+</ol>
+
+<h2 id="scaling-up-video-duration-by-interpolation-and-extrapolation">Scaling up video duration by interpolation and extrapolation</h2>
+
+<p>Last time I did video interpolation on the whole clip, which contains two interpolation stages: 5 frames –&gt; 17 frames –&gt; 65 frames</p>
+
+<p>And using local attention to crop down computational requirements</p>
+
+<p>Although it is working at least, but generating 65 frames already consumed 24GB vram even with accelerate/deepspeed optimization and gradient checkpointing</p>
+
+<p>If to generate as long as 181 frames, I decided to train the model in a autoregressive way</p>
+
+<ol>
+  <li>a base model generating 4 frames, and with some hacky inference technique, can generate 7 frames, as called “starter model”</li>
+  <li>a extrapolation model generate new 3 frames from the previous frames, but with a step of every 4th frames</li>
+  <li>a interpolation model fills the previously newly generated 3 frames with a total of 9 frames (fill in 3 frames into the two gaps)</li>
+</ol>
+
+<p>The frame number generated in the following way (newly generated frame ends with a !):</p>
+
+<ul>
+  <li>1, 2!, 3!, 4!, 5!, 6!, 7!</li>
+  <li>1, 2, 3, 7, 11!, 15!, 19!</li>
+  <li>1, 2, 6, 7, 8!, 9!, 10!, 11 …</li>
+</ul>
+
+<p>I know it’s vague, don’t get too serious about it, it is a rough hack by myself and does not work too well, for now</p>
+
+<p>Good thing is that by this method, I don’t need to do gradient checkpointing and cpu offloading, which speeds up training further, not to mention 7 frames iters far quicker every step than 65 frames</p>
+
+<p>However, when handling dataset this large, I need to further speed it up, not only on the training side</p>
+
+<h2 id="dataset-hack--cheating">Dataset hack &amp; cheating</h2>
+
+<p><strong>Well, if you are doing academical reserch, don’t do anything like this</strong></p>
+
+<p>I got inspired by <a href="https://arxiv.org/abs/2206.07137">https://arxiv.org/abs/2206.07137</a>, as the title suggests:</p>
+
+<blockquote>
+  <p>Prioritized Training on Points that are Learnable, Worth Learning, and Not Yet Learnt</p>
+</blockquote>
+
+<p>I decided to train the model on the full dataset first (and never ending), for a few epochs, then determine which data points are worth learning</p>
+
+<p>I don’t want to talk about it in detail, changing the dataset itself mid-training is a forbidden method because the result of the training became unreproducible and fragile</p>
+
+<p>However since I never finish training or writing papers, so this is not a problem to me</p>
+
+<p>I deleted 10% of the dataset which seems to be hard to learn in the first starter stage</p>
+
+<p>And also 10% in the expolation skipper stage, too, but not the same 10% (yeah, maybe it would be better if treated the same)</p>
+
+<p>The training loss drop like crazy, and the test generation is improving faster after since</p>
+
+<p>However, I can’t give out any proof of what I felt, this experiment is totally inaccurate because of the following reasons</p>
+
+<h2 id="noise-augmentation-to-keep-the-long-time-consistency">Noise augmentation to keep the long time consistency</h2>
+
+<p>When doing autoregressive generation, error gathers every iteration, so say we generate 120 frames in my method, we need to generate around 10 loops, each loop using previously generated content as hint, and that could be very inaccurate</p>
+
+<p>So firstly I employ signal noise ratio 0.33 at generated frames (but not the first hint frame), it seems to be good when testing with very few test clips</p>
+
+<p>Then I found it wasn’t enough, then I changed the augmentation noise, from signal noise ratio 0.33 to 0.66, it gets better, I feel better, no proof of any kind however …</p>
+
+<p>And this means I changed the augmentation mid-training, I would be fired if I am a scientist LOL</p>
+
+<h2 id="half-way-fix-of-half-way-attention">half-way fix of half-way attention</h2>
+
+<p>When I coded the first version of this experiment, I used a half-way attention to split the sequence in half then combine after calculation</p>
+
+<p>Which yields max 0.06 error every time and the average error is 0.01, I thought that was acceptable, much better than out of vram doing nothing</p>
+
+<p>But yet I forgot about it, and didn’t revert the half-way attention hack, when I realized about this, I decided to revert to ‘correct as a whole’ attention mid-training</p>
+
+<p>Okay, this is to say, I changed the model structure at mid training, this is not good, very not good, but neccesary</p>
+
+<h2 id="power-failure-and-forgot-to-dump-adam-optimizer-state">Power failure and forgot to dump adam optimizer state</h2>
+
+<p>Em… yeah, I forgot to dump adam optimizer state at first, then my apartment got power failure mid-training</p>
+
+<p>So, the training does not need to restart from the beginning but the training loss went crazy for days before it talks sense</p>
+
+<h2 id="what-i-learned-from-the-experiment">What I learned from the experiment</h2>
+
+<p>So much for confession, despite all the bad things I hacked and fixed, I actually learned something as follows</p>
+
+<ol>
+  <li>Always dump optimizer states when training with adam something</li>
+  <li>A hack can be helpful at first when testing, if you forget about it when scaling up, it could be a disaster</li>
+  <li>Noise augmentation is very cool, but determine how much noise to add, is a total pain in the (beep)</li>
+  <li>Autoregressive is good, saves vram, saves time, if you code it right, it will crash later than sooner</li>
+  <li>I realized I have to redo the experiment again with smarter generation schedule to make sure the quality won’t drop significantly across time, not to mention everything I did wrong</li>
+</ol>
+
+<h2 id="not-really-a-conclusion">Not Really a Conclusion</h2>
+
+<p>I changed model structure, augmentation, dataset, and optimizer state mid-training, these are unforgivable mistakes that should be avoided, but</p>
+
+<p>At least it works, barely works, but it works</p>
+
+<p>And hey, it’s under 24GB vram, and capable of generating hundreds of frames</p>
+
+<p>I am so eager to share with everyone what I did good, but currently the quality is poor, that is to say I am not doing good for now</p>
+
+<p>So at it’s current state, if to claim that the model works, it would be a false claim, sharing non-working code would be irresponsible and thus I won’t update my github repo this time, but hopefully not for long</p>
+
+<h2 id="limitations">Limitations</h2>
+
+<ol>
+  <li>Every time the generated illustrated figure tries to turn their heads left or right, it creates artifacts, stable diffusion v1.5 cannot handle these circumstances well</li>
+  <li>The generated figure tends to become female in the autoregressive pipeline, due to the dataset bias</li>
+  <li>Although in theory it can generate unlimited length of clips, human rapid actions always reach a status that the generation is broken, such as too far or too close to the camera etc</li>
+  <li>If the generated figure not moving fast, there is overfitting on background</li>
+</ol>
+
+<h2 id="citations">Citations</h2>
+
+<p>Thanks to the opensource repos made by <a href="https://github.com/lucidrains">https://github.com/lucidrains</a> , including but not limited to:</p>
+
+<p>https://github.com/lucidrains/make-a-video-pytorch</p>
+
+<p>https://github.com/lucidrains/video-diffusion-pytorch</p>
+
+<p>And my code is based on <a href="https://github.com/huggingface/diffusers">https://github.com/huggingface/diffusers</a>, especially most of the speed up tricks are bundled within the original repository</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{mindermann2022prioritized,
+      title={Prioritized Training on Points that are Learnable, Worth Learning, and Not Yet Learnt}, 
+      author={Sören Mindermann and Jan Brauner and Muhammed Razzak and Mrinank Sharma and Andreas Kirsch and Winnie Xu and Benedikt Höltgen and Aidan N. Gomez and Adrien Morisot and Sebastian Farquhar and Yarin Gal},
+      year={2022},
+      eprint={2206.07137},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{Singer2022,
+    author  = {Uriel Singer},
+    url     = {https://makeavideo.studio/Make-A-Video.pdf}
+}
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@misc{von-platen-etal-2022-diffusers,
+  author = {Patrick von Platen and Suraj Patil and Anton Lozhkov and Pedro Cuenca and Nathan Lambert and Kashif Rasul and Mishig Davaadorj and Thomas Wolf},
+  title = {Diffusers: State-of-the-art diffusion models},
+  year = {2022},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/huggingface/diffusers}}
+}
+</code></pre></div></div>
+
+  </div><a class="u-url" href="/jekyll/update/2023/07/09/scaling-up-longer-video-generation-without-more-gpus.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Something I found</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Something I found</li><li><a class="u-email" href="mailto:lxj616cn@gmail.com">lxj616cn@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lxj616</span></a></li><li><a href="https://www.twitter.com/lxj616"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg> <span class="username">lxj616</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>There is no description for this lxj616&#39;s blog, lazy dude, nah</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

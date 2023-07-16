@@ -1,4 +1,182 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-03-10T20:15:12+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">在24gb显存下教育外国大模型替中国说话</title><link href="http://localhost:4000/jekyll/update/2023/03/10/finetune-flan-x5-xxl-under-24gb-vram.html" rel="alternate" type="text/html" title="在24gb显存下教育外国大模型替中国说话" /><published>2023-03-10T19:33:05+08:00</published><updated>2023-03-10T19:33:05+08:00</updated><id>http://localhost:4000/jekyll/update/2023/03/10/finetune-flan-x5-xxl-under-24gb-vram</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/03/10/finetune-flan-x5-xxl-under-24gb-vram.html">&lt;h1 id=&quot;在24gb显存下教育外国大模型替中国说话&quot;&gt;在24gb显存下教育外国大模型替中国说话&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-07-16T17:19:52+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Something I found</title><subtitle>There is no description for this lxj616's blog, lazy dude, nah</subtitle><entry><title type="html">Scaling up longer video generation model training without more gpus</title><link href="http://localhost:4000/jekyll/update/2023/07/09/scaling-up-longer-video-generation-without-more-gpus.html" rel="alternate" type="text/html" title="Scaling up longer video generation model training without more gpus" /><published>2023-07-09T21:46:14+08:00</published><updated>2023-07-09T21:46:14+08:00</updated><id>http://localhost:4000/jekyll/update/2023/07/09/scaling-up-longer-video-generation-without-more-gpus</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/07/09/scaling-up-longer-video-generation-without-more-gpus.html">&lt;h1 id=&quot;scaling-up-longer-video-generation-model-training-without-more-gpus&quot;&gt;Scaling Up Longer Video Generation Model Training Without More GPUs&lt;/h1&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/darth_vader_final.gif&quot; alt=&quot;darth_vader_final.gif&quot; /&gt;
+&lt;img src=&quot;/assets/harley_final.gif&quot; alt=&quot;harley_final.gif&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The gif is manually resized to 256x256 and heavy lossy compressed using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gifsicle -O3 --lossy=200 --resize 256x256&lt;/code&gt; for better blog network loading speed, originally trained at 512x512 and generates more than 181 frames&lt;/p&gt;
+
+&lt;p&gt;However these gifs are more than 1MB each, so if you have trouble loading the gif, you may need to go and download from github blog repo yourself, I can’t compress the gifs any further&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;The dataset and model heavy resemble real life human with personal identity such as faces and bodys, thus can not go opensource for legal concerns&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;tldr&quot;&gt;TL;DR&lt;/h2&gt;
+
+&lt;p&gt;I used my RTX 3090Ti and created a 24370 clips dataset and trained a model under 24GB vram limitation that is capable of generating hundreds of frames with some consistency to the first frame, but during this experiment I changed every possible thing mid-training so there is no solid proof of what I learnt except for it more or less works this way&lt;/p&gt;
+
+&lt;h2 id=&quot;scaling-up-the-dataset&quot;&gt;Scaling up the dataset&lt;/h2&gt;
+
+&lt;p&gt;Last time I hand crafted a walking on stage video dataset containing 2848 clips, and I trained on each first 65 frames&lt;/p&gt;
+
+&lt;p&gt;Which is bigger than the far previous 286 timelapse video dataset, but still too small for some real challenge&lt;/p&gt;
+
+&lt;p&gt;So I gathered a human dancing dataset from various internet sources, containing 24370 video clips and has 181 frames each&lt;/p&gt;
+
+&lt;p&gt;It is the most difficult subject for image generation and video generation: human and rapid motion&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;The clips are aligned using pose detection, and resized to 512x512&lt;/li&gt;
+  &lt;li&gt;Each clip contains at maximum 2 alternative augmentation, so there are more than 24370 actual clips when training&lt;/li&gt;
+  &lt;li&gt;Contains some “bad” clips which contains heavy camera motion, or the human ran out of screen&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;scaling-up-video-duration-by-interpolation-and-extrapolation&quot;&gt;Scaling up video duration by interpolation and extrapolation&lt;/h2&gt;
+
+&lt;p&gt;Last time I did video interpolation on the whole clip, which contains two interpolation stages: 5 frames –&amp;gt; 17 frames –&amp;gt; 65 frames&lt;/p&gt;
+
+&lt;p&gt;And using local attention to crop down computational requirements&lt;/p&gt;
+
+&lt;p&gt;Although it is working at least, but generating 65 frames already consumed 24GB vram even with accelerate/deepspeed optimization and gradient checkpointing&lt;/p&gt;
+
+&lt;p&gt;If to generate as long as 181 frames, I decided to train the model in a autoregressive way&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;a base model generating 4 frames, and with some hacky inference technique, can generate 7 frames, as called “starter model”&lt;/li&gt;
+  &lt;li&gt;a extrapolation model generate new 3 frames from the previous frames, but with a step of every 4th frames&lt;/li&gt;
+  &lt;li&gt;a interpolation model fills the previously newly generated 3 frames with a total of 9 frames (fill in 3 frames into the two gaps)&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The frame number generated in the following way (newly generated frame ends with a !):&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1, 2!, 3!, 4!, 5!, 6!, 7!&lt;/li&gt;
+  &lt;li&gt;1, 2, 3, 7, 11!, 15!, 19!&lt;/li&gt;
+  &lt;li&gt;1, 2, 6, 7, 8!, 9!, 10!, 11 …&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I know it’s vague, don’t get too serious about it, it is a rough hack by myself and does not work too well, for now&lt;/p&gt;
+
+&lt;p&gt;Good thing is that by this method, I don’t need to do gradient checkpointing and cpu offloading, which speeds up training further, not to mention 7 frames iters far quicker every step than 65 frames&lt;/p&gt;
+
+&lt;p&gt;However, when handling dataset this large, I need to further speed it up, not only on the training side&lt;/p&gt;
+
+&lt;h2 id=&quot;dataset-hack--cheating&quot;&gt;Dataset hack &amp;amp; cheating&lt;/h2&gt;
+
+&lt;p&gt;&lt;strong&gt;Well, if you are doing academical reserch, don’t do anything like this&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;I got inspired by &lt;a href=&quot;https://arxiv.org/abs/2206.07137&quot;&gt;https://arxiv.org/abs/2206.07137&lt;/a&gt;, as the title suggests:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Prioritized Training on Points that are Learnable, Worth Learning, and Not Yet Learnt&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I decided to train the model on the full dataset first (and never ending), for a few epochs, then determine which data points are worth learning&lt;/p&gt;
+
+&lt;p&gt;I don’t want to talk about it in detail, changing the dataset itself mid-training is a forbidden method because the result of the training became unreproducible and fragile&lt;/p&gt;
+
+&lt;p&gt;However since I never finish training or writing papers, so this is not a problem to me&lt;/p&gt;
+
+&lt;p&gt;I deleted 10% of the dataset which seems to be hard to learn in the first starter stage&lt;/p&gt;
+
+&lt;p&gt;And also 10% in the expolation skipper stage, too, but not the same 10% (yeah, maybe it would be better if treated the same)&lt;/p&gt;
+
+&lt;p&gt;The training loss drop like crazy, and the test generation is improving faster after since&lt;/p&gt;
+
+&lt;p&gt;However, I can’t give out any proof of what I felt, this experiment is totally inaccurate because of the following reasons&lt;/p&gt;
+
+&lt;h2 id=&quot;noise-augmentation-to-keep-the-long-time-consistency&quot;&gt;Noise augmentation to keep the long time consistency&lt;/h2&gt;
+
+&lt;p&gt;When doing autoregressive generation, error gathers every iteration, so say we generate 120 frames in my method, we need to generate around 10 loops, each loop using previously generated content as hint, and that could be very inaccurate&lt;/p&gt;
+
+&lt;p&gt;So firstly I employ signal noise ratio 0.33 at generated frames (but not the first hint frame), it seems to be good when testing with very few test clips&lt;/p&gt;
+
+&lt;p&gt;Then I found it wasn’t enough, then I changed the augmentation noise, from signal noise ratio 0.33 to 0.66, it gets better, I feel better, no proof of any kind however …&lt;/p&gt;
+
+&lt;p&gt;And this means I changed the augmentation mid-training, I would be fired if I am a scientist LOL&lt;/p&gt;
+
+&lt;h2 id=&quot;half-way-fix-of-half-way-attention&quot;&gt;half-way fix of half-way attention&lt;/h2&gt;
+
+&lt;p&gt;When I coded the first version of this experiment, I used a half-way attention to split the sequence in half then combine after calculation&lt;/p&gt;
+
+&lt;p&gt;Which yields max 0.06 error every time and the average error is 0.01, I thought that was acceptable, much better than out of vram doing nothing&lt;/p&gt;
+
+&lt;p&gt;But yet I forgot about it, and didn’t revert the half-way attention hack, when I realized about this, I decided to revert to ‘correct as a whole’ attention mid-training&lt;/p&gt;
+
+&lt;p&gt;Okay, this is to say, I changed the model structure at mid training, this is not good, very not good, but neccesary&lt;/p&gt;
+
+&lt;h2 id=&quot;power-failure-and-forgot-to-dump-adam-optimizer-state&quot;&gt;Power failure and forgot to dump adam optimizer state&lt;/h2&gt;
+
+&lt;p&gt;Em… yeah, I forgot to dump adam optimizer state at first, then my apartment got power failure mid-training&lt;/p&gt;
+
+&lt;p&gt;So, the training does not need to restart from the beginning but the training loss went crazy for days before it talks sense&lt;/p&gt;
+
+&lt;h2 id=&quot;what-i-learned-from-the-experiment&quot;&gt;What I learned from the experiment&lt;/h2&gt;
+
+&lt;p&gt;So much for confession, despite all the bad things I hacked and fixed, I actually learned something as follows&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Always dump optimizer states when training with adam something&lt;/li&gt;
+  &lt;li&gt;A hack can be helpful at first when testing, if you forget about it when scaling up, it could be a disaster&lt;/li&gt;
+  &lt;li&gt;Noise augmentation is very cool, but determine how much noise to add, is a total pain in the (beep)&lt;/li&gt;
+  &lt;li&gt;Autoregressive is good, saves vram, saves time, if you code it right, it will crash later than sooner&lt;/li&gt;
+  &lt;li&gt;I realized I have to redo the experiment again with smarter generation schedule to make sure the quality won’t drop significantly across time, not to mention everything I did wrong&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;not-really-a-conclusion&quot;&gt;Not Really a Conclusion&lt;/h2&gt;
+
+&lt;p&gt;I changed model structure, augmentation, dataset, and optimizer state mid-training, these are unforgivable mistakes that should be avoided, but&lt;/p&gt;
+
+&lt;p&gt;At least it works, barely works, but it works&lt;/p&gt;
+
+&lt;p&gt;And hey, it’s under 24GB vram, and capable of generating hundreds of frames&lt;/p&gt;
+
+&lt;p&gt;I am so eager to share with everyone what I did good, but currently the quality is poor, that is to say I am not doing good for now&lt;/p&gt;
+
+&lt;p&gt;So at it’s current state, if to claim that the model works, it would be a false claim, sharing non-working code would be irresponsible and thus I won’t update my github repo this time, but hopefully not for long&lt;/p&gt;
+
+&lt;h2 id=&quot;limitations&quot;&gt;Limitations&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Every time the generated illustrated figure tries to turn their heads left or right, it creates artifacts, stable diffusion v1.5 cannot handle these circumstances well&lt;/li&gt;
+  &lt;li&gt;The generated figure tends to become female in the autoregressive pipeline, due to the dataset bias&lt;/li&gt;
+  &lt;li&gt;Although in theory it can generate unlimited length of clips, human rapid actions always reach a status that the generation is broken, such as too far or too close to the camera etc&lt;/li&gt;
+  &lt;li&gt;If the generated figure not moving fast, there is overfitting on background&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;citations&quot;&gt;Citations&lt;/h2&gt;
+
+&lt;p&gt;Thanks to the opensource repos made by &lt;a href=&quot;https://github.com/lucidrains&quot;&gt;https://github.com/lucidrains&lt;/a&gt; , including but not limited to:&lt;/p&gt;
+
+&lt;p&gt;https://github.com/lucidrains/make-a-video-pytorch&lt;/p&gt;
+
+&lt;p&gt;https://github.com/lucidrains/video-diffusion-pytorch&lt;/p&gt;
+
+&lt;p&gt;And my code is based on &lt;a href=&quot;https://github.com/huggingface/diffusers&quot;&gt;https://github.com/huggingface/diffusers&lt;/a&gt;, especially most of the speed up tricks are bundled within the original repository&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{mindermann2022prioritized,
+      title={Prioritized Training on Points that are Learnable, Worth Learning, and Not Yet Learnt}, 
+      author={Sören Mindermann and Jan Brauner and Muhammed Razzak and Mrinank Sharma and Andreas Kirsch and Winnie Xu and Benedikt Höltgen and Aidan N. Gomez and Adrien Morisot and Sebastian Farquhar and Yarin Gal},
+      year={2022},
+      eprint={2206.07137},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{Singer2022,
+    author  = {Uriel Singer},
+    url     = {https://makeavideo.studio/Make-A-Video.pdf}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{von-platen-etal-2022-diffusers,
+  author = {Patrick von Platen and Suraj Patil and Anton Lozhkov and Pedro Cuenca and Nathan Lambert and Kashif Rasul and Mishig Davaadorj and Thomas Wolf},
+  title = {Diffusers: State-of-the-art diffusion models},
+  year = {2022},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/huggingface/diffusers}}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Scaling Up Longer Video Generation Model Training Without More GPUs</summary></entry><entry><title type="html">在24gb显存下教育外国大模型替中国说话</title><link href="http://localhost:4000/jekyll/update/2023/03/10/finetune-flan-x5-xxl-under-24gb-vram.html" rel="alternate" type="text/html" title="在24gb显存下教育外国大模型替中国说话" /><published>2023-03-10T19:33:05+08:00</published><updated>2023-03-10T19:33:05+08:00</updated><id>http://localhost:4000/jekyll/update/2023/03/10/finetune-flan-x5-xxl-under-24gb-vram</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2023/03/10/finetune-flan-x5-xxl-under-24gb-vram.html">&lt;h1 id=&quot;在24gb显存下教育外国大模型替中国说话&quot;&gt;在24gb显存下教育外国大模型替中国说话&lt;/h1&gt;
 
 &lt;p&gt;For english readers: this post is about “Finetune flan-t5-xxl under 24gb vram”, you can view &lt;a href=&quot;https://www.philschmid.de/fine-tune-flan-t5-deepspeed&quot;&gt;philschmid tutorial&lt;/a&gt; and find my code and model at &lt;a href=&quot;https://www.modelscope.cn/models/lxj616/flan-t5-xxl-lora-chinese-spokesman&quot;&gt;modelscope&lt;/a&gt;&lt;/p&gt;
 
@@ -1420,175 +1598,4 @@ data:
   copyright = {Creative Commons Attribution 4.0 International}
 }
 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Rethinking The Danbooru 2021 Dataset</summary></entry><entry><title type="html">Keypoint Based Anime Generation With Additional CLIP Guided Tuning</title><link href="http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html" rel="alternate" type="text/html" title="Keypoint Based Anime Generation With Additional CLIP Guided Tuning" /><published>2022-05-14T18:36:10+08:00</published><updated>2022-05-14T18:36:10+08:00</updated><id>http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning</id><content type="html" xml:base="http://localhost:4000/jekyll/update/2022/05/14/keypoint-based-anime-generation-with-additional-clip-guided-tuning.html">&lt;h1 id=&quot;keypoint-based-anime-generation-with-additional-clip-guided-tuning&quot;&gt;Keypoint Based Anime Generation With Additional CLIP Guided Tuning&lt;/h1&gt;
-
-&lt;p&gt;Make anime drawings with a selective pose and text captioning, is now possible&lt;/p&gt;
-
-&lt;p&gt;Well… to be precisely, It has been possible in theory for many years, but getting such a task done requires so much computing power&lt;/p&gt;
-
-&lt;p&gt;Or, does it ?&lt;/p&gt;
-
-&lt;p&gt;vq-f16 cond_transformer (real world pose keypoints):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/00019.jpg&quot; alt=&quot;VQGAN f16 With Conditional Transformer&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/00055.jpg&quot; alt=&quot;VQGAN f16 With Conditional Transformer 2&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;vq-f4 latent-diffusion (pose from the training set, keypoints, input, reconstruction, ddim progressive row):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/ldm_example.jpg&quot; alt=&quot;VQGAN f4 With latent diffusion&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;To avoid possible confusion, the image above is cherrypicked for better illustration of diffusion models, and is from the training set, result from testing the vq-f4 ldm model with real world poses are shown in below sections&lt;/p&gt;
-
-&lt;h2 id=&quot;possible-for-low-computing-scenarios&quot;&gt;Possible for low computing scenarios&lt;/h2&gt;
-
-&lt;p&gt;I have been testing different models &amp;amp; configs to get this done with my single RTX 3090 Ti and very limited human lifespan&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Finally I made it possible to train within a week (1 day for vq-f4 and 4 days for latent-diffusion as optimal, however I continue to observe the overfitting for another 3 days), and I also tried some extreme settings such as vq-f8 + 1/3 dataset with no luck&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;Here are the specs and models I experiments on:&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th&gt;Model&lt;/th&gt;
-      &lt;th&gt;Spec&lt;/th&gt;
-      &lt;th&gt;Dataset&lt;/th&gt;
-      &lt;th&gt;Time&lt;/th&gt;
-      &lt;th&gt;Note&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;cond_transformer&lt;/td&gt;
-      &lt;td&gt;vq-f16&lt;/td&gt;
-      &lt;td&gt;363k&lt;/td&gt;
-      &lt;td&gt;20d&lt;/td&gt;
-      &lt;td&gt;vanilla first attempt&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;ddpm&lt;/td&gt;
-      &lt;td&gt;vq-f4&lt;/td&gt;
-      &lt;td&gt;363k&lt;/td&gt;
-      &lt;td&gt;8d&lt;/td&gt;
-      &lt;td&gt;overfitting at day 5, 20 epochs&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;ddpm&lt;/td&gt;
-      &lt;td&gt;vq-f8&lt;/td&gt;
-      &lt;td&gt;101k&lt;/td&gt;
-      &lt;td&gt;4d&lt;/td&gt;
-      &lt;td&gt;too less data harms training&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;Please do remember these experiments are not with best optimal settings, some training time are redundant, dataset cleaning a little overhead, and will discuss what went wrong in the following blog entries&lt;/p&gt;
-
-&lt;p&gt;A glance at the cherry-picked results for each spec&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;vq-f16 ViT &lt;img src=&quot;/assets/00019_1_40.jpg&quot; alt=&quot;vq-f16 cond_transformer&quot; /&gt;&lt;/li&gt;
-  &lt;li&gt;vq-f4 ddpm &lt;img src=&quot;/assets/000068_1.jpg&quot; alt=&quot;vq-f4 ddpm&quot; /&gt;&lt;/li&gt;
-  &lt;li&gt;vq-f8 ddpm &lt;img src=&quot;/assets/000034_1.jpg&quot; alt=&quot;vq-f8 ddpm&quot; /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;vq-f4 / vq-f8 are easily converge in several epochs, and vq-f16 using 256 channels reconstruction image seems to be not improving after two weeks, and I used a small batch of 4 so vq-f16 trains much longer&lt;/p&gt;
-
-&lt;p&gt;diffusion model for 64x64 spartial size I trained for 7 days, around 32 epochs, overfitting at around day 4, 20 epochs&lt;/p&gt;
-
-&lt;p&gt;I found that the vq-f4 ddpm model outperforms vq-f16 cond_transformer, even with half the training time altogether, suggesting the vq-f16 hit its limit long before reaching 20 days, the loss is still decreasing, weird&lt;/p&gt;
-
-&lt;p&gt;Without cherry-picking, vq-f4 ddpm generates semantically consistent poses for the given condition, while vq-f16 cond_transformer could sometimes generate a total mess&lt;/p&gt;
-
-&lt;p&gt;But when using CLIP Guided tuning, vq-f16 is semantically better than vq-f8 and CLIP almost doesn’t work with vq-f4, tests as below&lt;/p&gt;
-
-&lt;h2 id=&quot;clip-guided-tuning-with-model-generated-anime-images&quot;&gt;CLIP guided tuning with model generated anime images&lt;/h2&gt;
-
-&lt;p&gt;A glance at the CLIP guided tuning example for each specs (using “colorful” as the magic word)&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;vq-f16 ViT &lt;img src=&quot;/assets/colorful_f16.jpg&quot; alt=&quot;vq-f16 cond_transformer&quot; /&gt;&lt;/li&gt;
-  &lt;li&gt;vq-f4 ddpm &lt;img src=&quot;/assets/000010_1629_50.jpg&quot; alt=&quot;vq-f4 ddpm&quot; /&gt;&lt;/li&gt;
-  &lt;li&gt;vq-f8 ddpm &lt;img src=&quot;/assets/000034_1_100.jpg&quot; alt=&quot;vq-f8 ddpm&quot; /&gt;&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;It’s pretty clear that vq-f8 is struggling to give different hair strands different color, but the semantic shape isn’t consistent around the large skirt region&lt;/p&gt;
-
-&lt;p&gt;And as for vq-f4, CLIP with it seems to be operating pure pixel-wise, everywhere except the hair seems weird and without meaning, and the hair itself is not colorful, only partially getting vibrant&lt;/p&gt;
-
-&lt;p&gt;It seems that the CLIP guidance alone does not composite the image semantically, to get better results, even with pre-composition from other models, the optimizing target lantent space is better style-based than composition-based&lt;/p&gt;
-
-&lt;h2 id=&quot;how-do-i-make-this-happen-under-low-computing-restrictions&quot;&gt;How do I make this happen under low computing restrictions&lt;/h2&gt;
-
-&lt;p&gt;In short, I learned it the hard way&lt;/p&gt;
-
-&lt;p&gt;I’m gonna start writing a serie of blogs explaining the whole process, by timeline order as follows&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Rethinking the Danbooru 2021 dataset&lt;/li&gt;
-  &lt;li&gt;A closer look into the latent-diffusion repo, do better than just looking&lt;/li&gt;
-  &lt;li&gt;The speed and quality trade-off for low computing scenarios&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;related-pose-keypoints-dataset-code-and-model-release&quot;&gt;Related pose keypoints dataset, code and model release&lt;/h2&gt;
-
-&lt;p&gt;Keypoints tar ball(more details in coming up posts):&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing&quot;&gt;https://drive.google.com/file/d/1KqdDfUJQkY-8MoQhnCCTXq-YpDciZlco/view?usp=sharing&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;Code of the latent-diffusion fork repo with keypoints conditioning (pretrained vq/ldm models included in repo README):&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/lxj616/latent-diffusion&quot;&gt;https://github.com/lxj616/latent-diffusion&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;citations&quot;&gt;Citations&lt;/h2&gt;
-
-&lt;p&gt;danbooru 2021 dataset originally contains 4.9m+ images, here I filtered out 363k subset, then further made a 101k tiny subset for further testing, https://www.gwern.net/Danbooru2021&lt;/p&gt;
-
-&lt;p&gt;latent diffusion models trained using &lt;a href=&quot;https://github.com/CompVis/latent-diffusion&quot;&gt;https://github.com/CompVis/latent-diffusion&lt;/a&gt; , modifications on keypoints conditioning&lt;/p&gt;
-
-&lt;p&gt;vq regularized models trained using &lt;a href=&quot;https://github.com/CompVis/taming-transformers&quot;&gt;https://github.com/CompVis/taming-transformers&lt;/a&gt; , no modifications&lt;/p&gt;
-
-&lt;p&gt;CLIP guided tuning using &lt;a href=&quot;https://twitter.com/RiversHaveWings/status/1516582795438567424&quot;&gt;https://twitter.com/RiversHaveWings/status/1516582795438567424&lt;/a&gt; , directly on vq regularized model latents, not reranking the composition stage&lt;/p&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{danbooru2021,
-    author = {Anonymous and Danbooru community and Gwern Branwen},
-    title = {Danbooru2021: A Large-Scale Crowdsourced and Tagged Anime Illustration Dataset},
-    howpublished = {\url{https://www.gwern.net/Danbooru2021}},
-    url = {https://www.gwern.net/Danbooru2021},
-    type = {dataset},
-    year = {2022},
-    month = {January},
-    timestamp = {2022-01-21},
-    note = {Accessed: DATE} }
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{rombach2021highresolution,
-      title={High-Resolution Image Synthesis with Latent Diffusion Models}, 
-      author={Robin Rombach and Andreas Blattmann and Dominik Lorenz and Patrick Esser and Björn Ommer},
-      year={2021},
-      eprint={2112.10752},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{esser2020taming,
-      title={Taming Transformers for High-Resolution Image Synthesis}, 
-      author={Patrick Esser and Robin Rombach and Björn Ommer},
-      year={2020},
-      eprint={2012.09841},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@misc{https://doi.org/10.48550/arxiv.2204.08583,
-  doi = {10.48550/ARXIV.2204.08583}, 
-  url = {https://arxiv.org/abs/2204.08583},
-  author = {Crowson, Katherine and Biderman, Stella and Kornis, Daniel and Stander, Dashiell and Hallahan, Eric and Castricato, Louis and Raff, Edward},
-  keywords = {Computer Vision and Pattern Recognition (cs.CV), FOS: Computer and information sciences, FOS: Computer and information sciences},
-  title = {VQGAN-CLIP: Open Domain Image Generation and Editing with Natural Language Guidance},
-  publisher = {arXiv},
-  year = {2022},
-  copyright = {Creative Commons Attribution Share Alike 4.0 International}
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Keypoint Based Anime Generation With Additional CLIP Guided Tuning</summary></entry></feed>
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">Rethinking The Danbooru 2021 Dataset</summary></entry></feed>
